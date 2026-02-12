@@ -1,0 +1,43 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap');
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Add custom animations using @layer theme in Tailwind v4 */
+@layer theme {
+    @keyframes marquee {
+        0% {
+            transform: translateX(0);
+        }
+
+        100% {
+            transform: translateX(-50%);
+        }
+    }
+
+    .animate-marquee {
+        animation: marquee linear infinite;
+    }
+}
+
+.signature {
+    font-family: 'Dancing Script', cursive;
+    /* font-size: 32px;  */
+    font-size: 25px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.animate-spin {
+    animation: spin 2s linear infinite;
+    /* Adjust 2s for slower or faster speed */
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
