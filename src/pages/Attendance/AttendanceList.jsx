@@ -61,7 +61,7 @@ const AttendanceList = () => {
                 <ViewAttendance date={popupView.date} />
             </Modal>
 
-            <div className="fixed top-14 left-55 right-0 bottom-0 bg-amber-300">
+            <div className="fixed top-14 left-0 lg:left-55 right-0 bottom-0 bg-amber-300">
 
                 <TableNew
                     title="Attendance"

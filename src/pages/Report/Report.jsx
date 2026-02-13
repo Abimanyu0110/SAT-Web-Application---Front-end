@@ -107,7 +107,7 @@ const Report = () => {
 
     return (
         <>
-            <div className="fixed top-14 left-55 right-0 bottom-0 overflow-y-auto bg-gray-50 p-6">
+            <div className="fixed top-14 left-0 lg:left-55 right-0 bottom-0 overflow-y-auto bg-gray-50 p-6">
 
                 {/* Page Title */}
                 <h1 className="text-2xl font-semibold text-gray-800 mb-6">

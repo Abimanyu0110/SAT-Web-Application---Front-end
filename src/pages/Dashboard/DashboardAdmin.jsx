@@ -40,7 +40,7 @@ const DashboardAdmin = () => {
 
   return (
     <>
-      <div className="fixed top-14 left-55 right-0 bottom-0 bg-gray-50 p-6 overflow-y-auto">
+      <div className="fixed top-14 left-0 lg:left-55 right-0 bottom-0 bg-gray-50 p-6 overflow-y-auto">
 
         {/* Page Title */}
         <h1 className="text-2xl font-semibold text-gray-800 mb-6">

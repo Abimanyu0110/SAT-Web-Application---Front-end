@@ -129,7 +129,7 @@ const TableNew = ({
                 <div className="px-5 py-5 pt-4 border-b-">
 
                     {/* Row 1: Title + Search (lg) + Buttons */}
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+                    <div className="flex flex-col- lg:flex-row lg:items-center justify-between gap-3">
 
                         {/* Left Section */}
                         <div className="flex flex-col sm:flex-row sm:items-center gap-3">
