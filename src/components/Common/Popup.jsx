@@ -95,7 +95,7 @@ export const Popup = ({
   return (
     // <div className={`fixed z-100 inset-0 bg-transparent ${type !== "success" && "backdrop-blur-xs"}`} >
     <div ref={popupRef} className={` opacity-01 popup fixed left-0 right-0 top-0 flex justify-center z-130 ${tablePopUp === true ? "mt-22" : "mt-3"}`}>
-      <div className="border-1 border-gray-200 dark:border-gray-500 opacty-0 popup bg-white flex items-center dark:bg-gray-900 dark:text-gray-200 text-sm text-gray-800 shadow-xl p-3 rounded-xl space-x-2">
+      <div className="border border-gray-200 dark:border-gray-500 opacty-0 popup bg-white flex items-center dark:bg-gray-900 dark:text-gray-200 text-sm text-gray-800 shadow-xl p-3 rounded-xl space-x-2">
         <div
           className={`opacity-01 popup p-2 text-white rounded-full ${document.getElementsByTagName("html")[0].getAttribute("dir") === "ltr" ? "mr-2" : "ml-2"}`}
           style={{

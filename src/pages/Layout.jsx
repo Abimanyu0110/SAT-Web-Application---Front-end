@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 
-import Sidebar from "./sideBar";
-import Navbar from "./navBar";
+import Sidebar from "./Sidebar";
+import Navbar from "./Navbar";
 import ConfirmDialog from "../components/Common/ConfirmDialog";
 import Notification from "../components/Common/Notification";
 
