@@ -121,7 +121,6 @@ const Report = () => {
                         <Dropdown
                             label="Year"
                             name="year"
-                            flex={false}
                             value={year}
                             // error={formik.errors.gender}
                             onChange={(e) => setYear(e)}
@@ -136,7 +135,6 @@ const Report = () => {
                         <Dropdown
                             label="Month"
                             name="month"
-                            flex={false}
                             value={month}
                             // error={formik.errors.gender}
                             onChange={(e) => setMonth(e)}
@@ -162,7 +160,6 @@ const Report = () => {
                             <Dropdown
                                 label="Class"
                                 name="class"
-                                flex={false}
                                 value={studentClass}
                                 // error={formik.errors.class}
                                 onChange={(e) => setStudentClass(e)}
@@ -187,7 +184,6 @@ const Report = () => {
                             <Dropdown
                                 label="Section"
                                 name="section"
-                                flex={false}
                                 value={section}
                                 // error={formik.errors.section}
                                 onChange={(e) => setSection(e)}

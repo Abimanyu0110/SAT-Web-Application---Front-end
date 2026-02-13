@@ -23,6 +23,7 @@ const Login = () => {
     const { header } = useAdmin();
     const navigate = useNavigate();
     const [popup, setPop] = useState(null);
+    const [btnLoading, setBtnLoading] = useState(false);
 
     // Form state
     const [formData, setFormData] = useState({
@@ -88,6 +89,8 @@ const Login = () => {
             if (adminLogin) payload.append("password", formData.password);
             else payload.append("secretCode", formData.secretCode);
 
+            setBtnLoading(true);
+
             // Send to API
             const { data } = await axios.post(API.HOST + API.LOGIN, payload, header);
 
@@ -106,8 +109,8 @@ const Login = () => {
                 if (adminData.role === "ADMIN") navigate(navLinks.DASHBOARD_ADMIN)
                 else navigate(navLinks.DASHBOARD_TEACHER);
             } else {
-                alert(JSON.stringify(data.message));
-                console.log(data.message)
+                setBtnLoading(false);
+                setPop({ title: data.message, type: "error" }); // Success popup
             }
         } catch (err) {
             // Collect validation errors
@@ -117,10 +120,14 @@ const Login = () => {
                     validationErrors[error.path] = error.message;
                 });
                 setErrors(validationErrors);
+                setBtnLoading(false);
             } else {
                 // alert("There was an error submitting the form.");
                 // alert(JSON.stringify(err));
+                setBtnLoading(false);
                 console.log(JSON.stringify(err));
+                // alert(JSON.stringify(data.message));
+                setPop({ title: data.message, type: "error" });
             }
         }
     };
@@ -133,12 +140,12 @@ const Login = () => {
     return (
         <>
             {popup != null && <Popup unmount={() => setPop(null)} title={popup.title} type={popup.type} />}
-            <div className="flex min-h-screen w-full flex-col items-center justify-center p-10">
+            <div className="flex min-h-screen w-full flex-col items-center justify-center px-3 md:p-10">
                 <h1 className="mb-6 text-center text-3xl font-bold text-sky-700">
                     Login
                 </h1>
 
-                <form className="mx-auto w-full max-w-md space-y-4 rounded-xl border border-gray-200 p-10 shadow-xl"
+                <form className="mx-auto w-full max-w-md space-y-4 rounded-xl border border-gray-200 px-5 py-8 md:p-10 shadow-xl"
                     onSubmit={handleSubmit}>
 
                     <div className="flex space-x-4 mb-10">
@@ -166,7 +173,6 @@ const Login = () => {
                         value={formData.email}
                         error={errors.email}
                         onChange={(e) => handleChange("email", e)}
-                        flex={false}
                         required
                     />
 
@@ -179,7 +185,6 @@ const Login = () => {
                             value={formData.password}
                             error={errors.password}
                             onChange={(e) => handleChange("password", e)}
-                            flex={false}
                             required
                         /> :
                         <TextField
@@ -190,7 +195,6 @@ const Login = () => {
                             value={formData.secretCode}
                             error={errors.secretCode}
                             onChange={(e) => handleChange("secretCode", e)}
-                            flex={false}
                             required
                         />
                     }
@@ -206,6 +210,7 @@ const Login = () => {
                             />
                         }
                         <Button
+                            loading={btnLoading}
                             label="Login"
                             type="submit"
                             className={``}

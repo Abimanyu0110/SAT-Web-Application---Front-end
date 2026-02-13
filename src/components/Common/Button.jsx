@@ -1,3 +1,5 @@
+import { CgSpinnerTwoAlt } from "react-icons/cg";
+
 const Button = ({
     label,
     onClick,
@@ -7,6 +9,7 @@ const Button = ({
     rounded = "md",
     width = "full",
     padding = "px-4 py-2",
+    loading = false,
     className
 }) => {
     return (
@@ -15,10 +18,14 @@ const Button = ({
             onClick={onClick}
             disabled={disabled}
             className={`${bgAndTextColor} ${padding} rounded-${rounded} hover:opacity-90 
-            transition disabled:opacity-50 cursor-pointer w-${width} ${className}`}
-        // className={`${className || "bg-sky-700 text-white px-4 py-2 rounded-md hover:opacity-90 transition disabled:opacity-50 cursor-pointer w-full"} `}
+            transition disabled:opacity-50 cursor-pointer w-${width} ${className}
+            flex items-center justify-center`}
         >
-            {label}
+            {loading ? (
+                <CgSpinnerTwoAlt className="animate-spin" />
+            ) : (
+                label
+            )}
         </button>
     );
 };

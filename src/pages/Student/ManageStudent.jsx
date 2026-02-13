@@ -164,6 +164,7 @@ const ManageStudent = ({
                     name="firstName"
                     type="text"
                     placeholder="Enter your First Name"
+                    flex="flex flex-col md:flex-row md:items-center"
                     value={formik.values.firstName}
                     error={formik.errors.firstName}
                     onChange={(e) => formik.setFieldValue("firstName", e, true)}
@@ -175,6 +176,7 @@ const ManageStudent = ({
                     name="lastName"
                     type="text"
                     placeholder="Enter your Last Name"
+                    flex="flex flex-col md:flex-row md:items-center"
                     value={formik.values.lastName}
                     error={formik.errors.lastName}
                     onChange={(e) => formik.setFieldValue("lastName", e)}
@@ -183,6 +185,7 @@ const ManageStudent = ({
                 <DateField
                     label="Date of Birth"
                     name="dob"
+                    flex="flex flex-col md:flex-row md:items-center"
                     value={formik.values.dob}
                     error={formik.errors.dob}
                     onChange={(e) => formik.setFieldValue("dob", e)}
@@ -191,6 +194,7 @@ const ManageStudent = ({
                 <Dropdown
                     label="Gender"
                     name="gender"
+                    flex="flex flex-col md:flex-row md:items-center"
                     value={formik.values.gender}
                     error={formik.errors.gender}
                     onChange={(e) => formik.setFieldValue("gender", e)}
@@ -208,6 +212,7 @@ const ManageStudent = ({
                     name="registerNumber"
                     type="text"
                     placeholder="Enter Register Number"
+                    flex="flex flex-col md:flex-row md:items-center"
                     value={formik.values.registerNumber}
                     error={formik.errors.registerNumber}
                     onChange={(e) => formik.setFieldValue("registerNumber", e)}
@@ -217,6 +222,7 @@ const ManageStudent = ({
                 <Dropdown
                     label="Class"
                     name="class"
+                    flex="flex flex-col md:flex-row md:items-center"
                     value={formik.values.class}
                     error={formik.errors.class}
                     onChange={(e) => formik.setFieldValue("class", e)}
@@ -241,6 +247,7 @@ const ManageStudent = ({
                 <Dropdown
                     label="Section"
                     name="section"
+                    flex="flex flex-col md:flex-row md:items-center"
                     value={formik.values.section}
                     error={formik.errors.section}
                     onChange={(e) => formik.setFieldValue("section", e)}
@@ -254,7 +261,7 @@ const ManageStudent = ({
                     required
                 />
 
-                <div className="flex space-x-5 mt-5">
+                <div className="md:flex space-x-5 mt-5">
                     <Button
                         label="Cancel"
                         bgAndTextColor="bg-gray-200 text-gray-900"

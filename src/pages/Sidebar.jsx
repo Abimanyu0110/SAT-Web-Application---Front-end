@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import Cookies from "js-cookie";
+
 import navLinks from "../../Utils/navLinks";
 import useAdmin from "../../Hooks/useAdmin";
 import ConfirmDialog from "../components/Common/ConfirmDialog";
 
-const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
+const Sidebar = ({ sidebarOpen, setSidebarOpen, openConfirm }) => {
+
     const navigate = useNavigate();
     const location = useLocation();
     const { admin } = useAdmin();
@@ -43,6 +46,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
     };
 
     const handleLogout = () => {
+        Cookies.remove("role");
+        Cookies.remove("userId");
+        Cookies.remove("userName");
+        Cookies.remove("accessToken");
         navigate(navLinks.LOGIN);
     };
 
@@ -89,7 +96,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                     {/* Logout */}
                     <div className="px-2 pb-4">
                         <button
-                            onClick={() => setLogoutPrompt(true)}
+                            // onClick={() => setLogoutPrompt(true)}
+                            onClick={() =>
+                                openConfirm({
+                                    title: "Logout",
+                                    message: "Are you sure you want to Logout?.",
+                                    action: handleLogout
+                                })
+                            }
                             className="
                 w-full text-left px-4 py-2 text-sm
                 bg-sky-50 text-sky-950
@@ -101,7 +115,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                     </div>
                 </div>
 
-                <ConfirmDialog
+                {/* <ConfirmDialog
                     isOpen={logoutPrompt}
                     title="Logout"
                     message="Are you sure you want to Logout?"
@@ -110,7 +124,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                         handleLogout();
                     }}
                     onNo={() => setLogoutPrompt(false)}
-                />
+                /> */}
             </aside>
         </>
     );
