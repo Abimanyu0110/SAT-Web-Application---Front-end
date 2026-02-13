@@ -1,6 +1,6 @@
 # abimanyu-portfolio
 
-
+add .env.local and add VITE_API_HOST=http://localhost:8080
 
 ## Getting started
 

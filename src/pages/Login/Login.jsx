@@ -106,7 +106,8 @@ const Login = () => {
                 if (adminData.role === "ADMIN") navigate(navLinks.DASHBOARD_ADMIN)
                 else navigate(navLinks.DASHBOARD_TEACHER);
             } else {
-                alert(data.message);
+                alert(JSON.stringify(data.message));
+                console.log(data.message)
             }
         } catch (err) {
             // Collect validation errors
@@ -117,7 +118,9 @@ const Login = () => {
                 });
                 setErrors(validationErrors);
             } else {
-                alert("There was an error submitting the form.");
+                // alert("There was an error submitting the form.");
+                // alert(JSON.stringify(err));
+                console.log(JSON.stringify(err));
             }
         }
     };

@@ -123,7 +123,8 @@ const Signup = () => {
                     resetForm();
                     navigate(navLinks.LOGIN)
                 } else {
-                    alert(data.message)
+                    alert(JSON.stringify(data.message))
+                    console.log(JSON.stringify(data.message))
                     // setBtnLoading(false);
                     // setPop({ title: data.message, type: "error" });
                 }
