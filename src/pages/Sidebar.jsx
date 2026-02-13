@@ -94,7 +94,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, openConfirm }) => {
                     </nav>
 
                     {/* Logout */}
-                    <div className="px-2 pb-4">
+                    <div className="px-2 pb-10 lg:pb-4 bg-amber-50-">
                         <button
                             // onClick={() => setLogoutPrompt(true)}
                             onClick={() =>

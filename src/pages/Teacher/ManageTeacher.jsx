@@ -283,7 +283,7 @@ const ManageTeacher = ({
                     required
                 />
 
-                <div className="space-y-2 md:flex space-x-5 mt-5">
+                <div className="space-y-3 md:flex space-x-5 mt-5">
                     <Button
                         label="Cancel"
                         bgAndTextColor="bg-gray-200 text-gray-900"

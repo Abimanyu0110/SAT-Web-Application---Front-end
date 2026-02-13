@@ -140,7 +140,7 @@ const Login = () => {
     return (
         <>
             {popup != null && <Popup unmount={() => setPop(null)} title={popup.title} type={popup.type} />}
-            <div className="flex min-h-screen w-full flex-col items-center justify-center px-3 md:p-10">
+            <div className="flex min-h-screen w-full flex-col items-center justify-center px-5 md:p-10">
                 <h1 className="mb-6 text-center text-3xl font-bold text-sky-700">
                     Login
                 </h1>

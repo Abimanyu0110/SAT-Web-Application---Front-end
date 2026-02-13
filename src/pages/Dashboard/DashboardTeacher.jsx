@@ -19,18 +19,26 @@ const DashboardTeacher = () => {
 
     const getTeacherDashboard = async () => {
         if (!id) return;
+        try {
+            const res = await axios.post(
+                API.HOST + API.GET_TEACHER_DASHOARD,
+                { id: id },
+                header
+            );
+            const data = res.data.data;
 
-        const res = await axios.post(
-            API.HOST + API.GET_TEACHER_DASHOARD,
-            { id: id },
-            header
-        );
-        const data = res.data.data;
-
-        if (res.data.code === 200) {
-            // alert(JSON.stringify(data.teacherDatas))
-            setTeacherDatas(data.teacherDatas || "");
-            setAttendanceList(data.attendanceList || []);
+            if (res.data.code === 200) {
+                // alert(JSON.stringify(data.teacherDatas))
+                setTeacherDatas(data.teacherDatas || "");
+                setAttendanceList(data.attendanceList || []);
+            }
+        }
+        catch (err) {
+            if (err.response && err.response.status === 401) {
+                navigate(navLinks.LOGIN); // <-- redirect to login page
+            } else {
+                alert(JSON.stringify(err));
+            }
         }
     }
 
@@ -67,7 +75,7 @@ const DashboardTeacher = () => {
 
                     <div className="bg-white p-5 rounded-lg shadow">
                         <p className="text-sm text-gray-500">My Class</p>
-                        <h2 className="text-3xl text-sky-700 font-bold">{(teacherDatas?.class + " " + teacherDatas?.section) || ""}</h2>
+                        <h2 className="text-3xl text-sky-700 font-bold">{(teacherDatas?.class || "") + " " + (teacherDatas?.section || "")}</h2>
                     </div>
 
                     <div className="bg-white p-5 rounded-lg shadow">

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Navigate, useNavigate } from "react-router-dom";
 
 // ----------- Components -------------------
 import Button from "./Button";
-
+import navLinks from "../../../Utils/navLinks";
 import useAdmin from "../../../Hooks/useAdmin";
 
 const TableNew = ({
@@ -26,7 +27,7 @@ const TableNew = ({
 }) => {
 
     const { header, admin, formatDate } = useAdmin();
-
+    const navigate = useNavigate();
     const [data, setData] = useState([]);
     const [totalCount, setTotalCount] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -60,9 +61,14 @@ const TableNew = ({
                 setData([]);
                 setTotalCount(0);
             }
-        } catch (error) {
-            console.error("Table API Error:", error);
+        } catch (err) {
             setData([]);
+            // Check if the error is from server (401)
+            if (err.response && err.response.status === 401) {
+                navigate(navLinks.LOGIN); // <-- redirect to login page
+            } else {
+                alert(JSON.stringify(err));
+            }
         } finally {
             setLoading(false);
         }

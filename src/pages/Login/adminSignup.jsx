@@ -144,12 +144,12 @@ const Signup = () => {
 
     return (
         <>
-            <div className="flex min-h-screen w-full flex-col items-center justify-center p-10">
+            <div className="flex min-h-screen w-full flex-col items-center justify-center px-5 md:p-10">
                 <h1 className="mb-6 text-center text-3xl font-bold text-sky-700">
                     Admin Signup
                 </h1>
 
-                <form className="mx-auto w-full max-w-lg space-y-4 rounded-xl border border-gray-200 p-10 shadow-xl"
+                <form className="mx-auto w-full max-w-lg space-y-4 rounded-xl border border-gray-200 px-5 py-8 md:p-10 shadow-xl"
                     onSubmit={formik.handleSubmit}>
                     {/* border-gray-200 shadow-xl p-10"> */}
                     <TextField
@@ -273,7 +273,7 @@ const Signup = () => {
                         required
                     />
 
-                    <div className="flex space-x-5 mt-5">
+                    <div className="space-y-3 md:flex space-x-5 mt-5">
                         <Button
                             label="Cancel & Go Back"
                             bgAndTextColor="bg-gray-200 text-gray-900"

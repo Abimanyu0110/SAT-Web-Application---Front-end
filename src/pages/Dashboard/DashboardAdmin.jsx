@@ -20,17 +20,28 @@ const DashboardAdmin = () => {
   const getAdminDashboard = async () => {
     if (!id) return;
 
-    const res = await axios.post(
-      API.HOST + API.GET_ADMIN_DASHOARD,
-      { id: id },
-      header
-    );
-    const data = res.data.data;
+    try {
+      const res = await axios.post(
+        API.HOST + API.GET_ADMIN_DASHOARD,
+        { id: id },
+        header
+      );
+      const data = res.data.data;
 
-    if (res.data.code === 200) {
-      // alert(JSON.stringify(data.adminDatas))
-      setAdminDatas(data.adminDatas || "");
-      setAttendanceList(data.attendanceList || []);
+      if (res.data.code === 200) {
+        // alert(JSON.stringify(data.adminDatas))
+        setAdminDatas(data.adminDatas || "");
+        setAttendanceList(data.attendanceList || []);
+      }
+    }
+    catch (err) {
+      // Check if the error is from server (401)
+      if (err.response && err.response.status === 401) {
+        alert("Session expired. Redirecting to login...");
+        navigate(navLinks.LOGIN); // <-- redirect to login page
+      } else {
+        alert(JSON.stringify(err));
+      }
     }
   }
 

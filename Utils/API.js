@@ -1,5 +1,5 @@
 const API = {
-    HOST: import.meta.env.VITE_API_HOST,
+    HOST: import.meta.env.VITE_API_HOST || "http://localhost:8080",
 
     // --------------- Admin ----------------------
     ADMIN_SIGNUP: "/api/admin/adminSignup",

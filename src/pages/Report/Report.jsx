@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 // Components
 import Dropdown from "../../components/Common/Dropdown";
@@ -11,6 +12,7 @@ import ConfirmDialog from "../../components/Common/ConfirmDialog";
 
 // Utils
 import API from "../../../Utils/API";
+import navLinks from "../../../Utils/navLinks";
 
 // Hooks
 import useAdmin from "../../../Hooks/useAdmin";
@@ -18,7 +20,7 @@ import useAdmin from "../../../Hooks/useAdmin";
 const Report = () => {
 
     const { openConfirm } = useOutletContext();
-
+    const navigate = useNavigate();
     const [month, setMonth] = useState("");
     const [year, setYear] = useState("");
     const [studentClass, setStudentClass] = useState("");
@@ -33,20 +35,28 @@ const Report = () => {
 
     const getAttendanceReport = async (year, month, studentClass, section) => {
         if (!userId && !role) return;
+        try {
+            const res = await axios.post(
+                API.HOST + API.GET_REPORT,
+                { userId: userId, role: role, year, month, studentClass, section },
+                header
+            );
+            const data = res.data.data;
 
-        const res = await axios.post(
-            API.HOST + API.GET_REPORT,
-            { userId: userId, role: role, year, month, studentClass, section },
-            header
-        );
-        const data = res.data.data;
-
-        if (res.data.code === 200) {
-            // alert(JSON.stringify(data))
-            setAttendanceList(data || []);
-            if (data?.length > 0 && role === "TEACHER") {
-                setStudentClass(data[0].class);
-                setSection(data[0].section);
+            if (res.data.code === 200) {
+                // alert(JSON.stringify(data))
+                setAttendanceList(data || []);
+                if (data?.length > 0 && role === "TEACHER") {
+                    setStudentClass(data[0].class);
+                    setSection(data[0].section);
+                }
+            }
+        }
+        catch (err) {
+            if (err.response && err.response.status === 401) {
+                navigate(navLinks.LOGIN); // <-- redirect to login page
+            } else {
+                alert(JSON.stringify(err));
             }
         }
     }
@@ -252,7 +262,7 @@ const Report = () => {
                 {/* Export Buttons */}
                 <div className="flex justify-end gap-3">
                     <Button
-                    width="50"
+                        width="50"
                         label="Export PDF"
                         className={`h-10`}
                         onClick={() =>

@@ -12,7 +12,7 @@ const ConfirmDialog = ({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 backdrop-blur-xs bg-opacity-40 flex items-center justify-center z-150">
+        <div className="fixed inset-0 backdrop-blur-xs bg-opacity-40 flex items-center justify-center z-150 px-10">
             <div className="bg-white w-full max-w-md rounded-lg shadow-xl border border-gray-200 p-6">
 
                 <h2 className="text-lg text-sky-800 font-semibold mb-2">

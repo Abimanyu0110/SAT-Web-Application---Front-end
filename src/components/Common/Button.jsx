@@ -22,7 +22,7 @@ const Button = ({
             flex items-center justify-center`}
         >
             {loading ? (
-                <CgSpinnerTwoAlt className="animate-spin" />
+                <CgSpinnerTwoAlt className="animate-spin text-2xl" />
             ) : (
                 label
             )}

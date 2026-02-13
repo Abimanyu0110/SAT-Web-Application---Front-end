@@ -261,7 +261,7 @@ const ManageStudent = ({
                     required
                 />
 
-                <div className="md:flex space-x-5 mt-5">
+                <div className="space-y-3 md:flex md:items-center space-x-5 mt-5">
                     <Button
                         label="Cancel"
                         bgAndTextColor="bg-gray-200 text-gray-900"
