@@ -144,7 +144,7 @@ const Signup = () => {
 
     return (
         <>
-            <div className="flex min-h-screen w-full flex-col items-center justify-center px-5 md:p-10">
+            <div className="flex min-h-screen w-full flex-col items-center justify-center p-5 md:p-10">
                 <h1 className="mb-6 text-center text-3xl font-bold text-sky-700">
                     Admin Signup
                 </h1>
@@ -157,6 +157,7 @@ const Signup = () => {
                         name="firstName"
                         type="text"
                         placeholder="Enter your First Name"
+                        flex="flex flex-col md:flex-row md:items-center"
                         value={formik.values.firstName}
                         error={formik.errors.firstName}
                         onChange={(e) => formik.setFieldValue("firstName", e, true)}
@@ -168,6 +169,7 @@ const Signup = () => {
                         name="lastName"
                         type="text"
                         placeholder="Enter your Last Name"
+                        flex="flex flex-col md:flex-row md:items-center"
                         value={formik.values.lastName}
                         error={formik.errors.lastName}
                         onChange={(e) => formik.setFieldValue("lastName", e)}
@@ -176,6 +178,7 @@ const Signup = () => {
                     <DateField
                         label="Date of Birth"
                         name="dob"
+                        flex="flex flex-col md:flex-row md:items-center"
                         value={formik.values.dob}
                         error={formik.errors.dob}
                         onChange={(e) => formik.setFieldValue("dob", e)}
@@ -193,6 +196,7 @@ const Signup = () => {
                             { label: "Female", value: "FEMALE" },
                             { label: "Other", value: "OTHER" },
                         ]}
+                        flex="flex flex-col md:flex-row md:items-center"
                         required
                     />
 
@@ -204,6 +208,7 @@ const Signup = () => {
                         value={formik.values.email}
                         error={formik.errors.email}
                         onChange={(e) => formik.setFieldValue("email", e)}
+                        flex="flex flex-col md:flex-row md:items-center"
                         required
                     />
 
@@ -215,6 +220,7 @@ const Signup = () => {
                         value={formik.values.password}
                         error={formik.errors.password}
                         onChange={(e) => formik.setFieldValue("password", e)}
+                        flex="flex flex-col md:flex-row md:items-center"
                         required
                     />
 
@@ -226,6 +232,7 @@ const Signup = () => {
                         value={formik.values.confirmPassword}
                         error={formik.errors.confirmPassword}
                         onChange={(e) => formik.setFieldValue("confirmPassword", e)}
+                        flex="flex flex-col md:flex-row md:items-center"
                         required
                     />
 
@@ -237,6 +244,7 @@ const Signup = () => {
                         value={formik.values.organizationName}
                         error={formik.errors.organizationName}
                         onChange={(e) => formik.setFieldValue("organizationName", e)}
+                        flex="flex flex-col md:flex-row md:items-center"
                         required
                     />
 
@@ -248,6 +256,7 @@ const Signup = () => {
                         value={formik.values.organizationCode}
                         error={formik.errors.organizationCode}
                         onChange={(e) => formik.setFieldValue("organizationCode", e)}
+                        flex="flex flex-col md:flex-row md:items-center"
                         required
                     />
 
@@ -259,6 +268,7 @@ const Signup = () => {
                         value={formik.values.secretCode}
                         error={formik.errors.secretCode}
                         onChange={(e) => formik.setFieldValue("secretCode", e)}
+                        flex="flex flex-col md:flex-row md:items-center"
                         required
                     />
 
@@ -270,10 +280,11 @@ const Signup = () => {
                         value={formik.values.shortName}
                         error={formik.errors.shortName}
                         onChange={(e) => formik.setFieldValue("shortName", e)}
+                        flex="flex flex-col md:flex-row md:items-center"
                         required
                     />
 
-                    <div className="space-y-3 md:flex space-x-5 mt-5">
+                    <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-5 mt-5">
                         <Button
                             label="Cancel & Go Back"
                             bgAndTextColor="bg-gray-200 text-gray-900"

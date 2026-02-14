@@ -56,10 +56,10 @@ function Layout() {
                 />
 
                 {/* Main */}
-                <div className="flex flex-1 flex-col bg-white">
+                <div className="flex flex-1 flex-col bg-gray-50">
                     <Navbar setSidebarOpen={setSidebarOpen} />
 
-                    <main className="flex-1 bg-white p-4 mt-14 lg:ml-55">
+                    <main className="flex-1 bg-gray-50 p-4 mt-14 lg:ml-55">
                         <Outlet context={{ openConfirm }} />
                     </main>
                 </div>

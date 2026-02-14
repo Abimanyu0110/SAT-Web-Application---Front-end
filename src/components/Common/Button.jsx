@@ -10,6 +10,7 @@ const Button = ({
     width = "full",
     padding = "px-4 py-2",
     loading = false,
+    iconSize = "2xl",
     className
 }) => {
     return (
@@ -18,11 +19,11 @@ const Button = ({
             onClick={onClick}
             disabled={disabled}
             className={`${bgAndTextColor} ${padding} rounded-${rounded} hover:opacity-90 
-            transition disabled:opacity-50 cursor-pointer w-${width} ${className}
+            transition disabled:bg-gray-300 disabled:cursor-not-allowed cursor-pointer w-${width} ${className}
             flex items-center justify-center`}
         >
             {loading ? (
-                <CgSpinnerTwoAlt className="animate-spin text-2xl" />
+                <CgSpinnerTwoAlt className={`animate-spin text-${iconSize}`} />
             ) : (
                 label
             )}

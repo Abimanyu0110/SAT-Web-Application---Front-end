@@ -7,9 +7,11 @@ import Checkbox from "../../components/Common/CheckBox";
 
 // Utils
 import API from "../../../Utils/API";
+import navLinks from "../../../Utils/navLinks";
 
 // Hooks
 import useAdmin from "../../../Hooks/useAdmin";
+import { useNavigate } from "react-router-dom";
 
 const ManageAttendance = ({
     closePopup,
@@ -17,7 +19,8 @@ const ManageAttendance = ({
     selectedDate, // 👈 optional (edit mode)
 }) => {
     const { header, admin } = useAdmin();
-
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
     const [students, setStudents] = useState([]);
     const [attendance, setAttendance] = useState({});
 
@@ -26,33 +29,39 @@ const ManageAttendance = ({
        FETCH STUDENTS
     ========================== */
     const getStudentsList = async () => {
-        const res = await axios.post(
-            API.HOST + API.STUDENTS_LIST,
-            {
-                id: admin.userId,
-                role: admin.role
-            },
-            header
-        );
+        setLoading(true);
+        try {
+            const res = await axios.post(
+                API.HOST + API.STUDENTS_LIST,
+                {
+                    id: admin.userId,
+                    role: admin.role
+                },
+                header
+            );
 
-        if (res.data.code === 200) {
-            const list = res.data.data.data;
-            setStudents(list);
+            if (res.data.code === 200) {
+                const list = res.data.data.data;
+                setStudents(list);
 
-            // const initial = {};
-            // list.forEach(s => (initial[s.id] = false));
-            // setAttendance(initial);
-
-            setAttendance(prev => {
-                const updated = { ...prev };
-                list.forEach(s => {
-                    if (updated[s.id] === undefined) {
-                        updated[s.id] = false;
-                    }
+                setAttendance(prev => {
+                    const updated = { ...prev };
+                    list.forEach(s => {
+                        if (updated[s.id] === undefined) {
+                            updated[s.id] = false;
+                        }
+                    });
+                    return updated;
                 });
-                return updated;
-            });
-///
+            }
+        } catch (err) {
+            if (err.response && err.response.status === 401) {
+                navigate(navLinks.LOGIN); // <-- redirect to login page
+            } else {
+                alert(JSON.stringify(err));
+            }
+        } finally {
+            // setLoading(false);
         }
     };
 
@@ -62,30 +71,32 @@ const ManageAttendance = ({
     const getAttendanceByDate = async () => {
         if (!selectedDate) return;
 
-        const res = await axios.post(
-            API.HOST + API.ATTENDANCE_DATA_BY_DATE,
-            { date: selectedDate, id: admin.userId },
-            header
-        );
+        try {
+            const res = await axios.post(
+                API.HOST + API.ATTENDANCE_DATA_BY_DATE,
+                { date: selectedDate, id: admin.userId },
+                header
+            );
 
-        if (res.data.code === 200) {
-            // alert(JSON.stringify(res.data.data))
-            const map = {};
-            res.data.data.forEach(a => {
-                map[a.studentId] = a.status === 1;
-            });
-            // alert(JSON.stringify(map))
-            setAttendance(prev => ({ ...prev, ...map }));
+            if (res.data.code === 200) {
+                // alert(JSON.stringify(res.data.data))
+                const map = {};
+                res.data.data.forEach(a => {
+                    map[a.studentId] = a.status === 1;
+                });
+                // alert(JSON.stringify(map))
+                setAttendance(prev => ({ ...prev, ...map }));
+            }
+        } catch (err) {
+            if (err.response && err.response.status === 401) {
+                navigate(navLinks.LOGIN); // <-- redirect to login page
+            } else {
+                alert(JSON.stringify(err));
+            }
+        } finally {
+            setLoading(false);
         }
     };
-
-    // useEffect(() => {
-    //     getStudentsList();
-    // }, []);
-
-    // useEffect(() => {
-    //     getAttendanceByDate();
-    // }, [selectedDate]);
 
     useEffect(() => {
         const init = async () => {
@@ -140,51 +151,62 @@ const ManageAttendance = ({
                 {selectedDate ? "Edit Attendance" : "Mark Attendance"}
             </h2>
 
-            <div className="border border-gray-200 shadow rounded-lg overflow-auto max-h-[400px]">
-                <table className="w-full">
-                    <thead className="bg-gray-200">
-                        <tr>
-                            <th className="border- p-2 text-start">Register No</th>
-                            <th className="border- p-2 text-start">Name</th>
-                            <th className="border- py-2 text-center">Attendance</th>
-                        </tr>
-                    </thead>
+            {loading ?
+                (
+                    <div className="px-4 py-15 text-center text-gray-600">
+                        Loading...
+                    </div>
+                ) : (
+                    <>
+                        <div className="border border-gray-200 shadow rounded-lg overflow-auto max-h-[400px]">
+                            <table className="w-full">
+                                <thead className="bg-sky-700 text-white">
+                                    <tr>
+                                        <th className="p-2 text-start">Register No</th>
+                                        <th className="p-2 text-start">Name</th>
+                                        <th className="py-2 text-center">Attendance</th>
+                                    </tr>
+                                </thead>
 
-                    <tbody>
-                        {students.map(student => (
-                            <tr key={student.id} className="border-b">
-                                <td className="border- p-2">
-                                    {student.registerNumber}
-                                </td>
-                                <td className="border- p-2">
-                                    {student.firstName} {student.lastName}
-                                </td>
-                                <td className="border- p-2 text-center- flex justify-center">
-                                    <Checkbox
-                                        value={attendance[student.id]}
-                                        onChange={val =>
-                                            handleAttendanceChange(student.id, val)
-                                        }
-                                        label={"Present"}
-                                    />
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                                <tbody>
+                                    {students.map(student => (
+                                        <tr key={student.id} className="border-b border-gray-300 text-gray-500">
+                                            <td className="p-2">
+                                                {student.registerNumber}
+                                            </td>
+                                            <td className="p-2">
+                                                {student.firstName} {student.lastName}
+                                            </td>
+                                            <td className="p-2 flex justify-center">
+                                                <Checkbox
+                                                    value={attendance[student.id]}
+                                                    onChange={val =>
+                                                        handleAttendanceChange(student.id, val)
+                                                    }
+                                                    label={"Present"}
+                                                />
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
 
-            <div className="flex justify-end gap-4 mt-5">
-                <Button
-                    label="Cancel"
-                    bgAndTextColor="bg-gray-200 text-gray-900"
-                    onClick={closePopup}
-                />
-                <Button
-                    label="Save Attendance"
-                    onClick={handleSubmit}
-                />
-            </div>
+
+                        <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-5 mt-5">
+                            <Button
+                                label="Cancel"
+                                bgAndTextColor="bg-gray-200 text-gray-900"
+                                onClick={closePopup}
+                            />
+                            <Button
+                                label="Save Attendance"
+                                onClick={handleSubmit}
+                            />
+                        </div>
+                    </>
+                )}
+
         </div>
     );
 };

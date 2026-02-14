@@ -9,6 +9,7 @@ import { Navigate } from "react-router-dom";
 import Dropdown from "../../components/Common/Dropdown";
 import Button from "../../components/Common/Button";
 import ConfirmDialog from "../../components/Common/ConfirmDialog";
+import { Popup } from "../../components/Common/Popup";
 
 // Utils
 import API from "../../../Utils/API";
@@ -25,16 +26,18 @@ const Report = () => {
     const [year, setYear] = useState("");
     const [studentClass, setStudentClass] = useState("");
     const [section, setSection] = useState("");
-
+    const [loading, setLoading] = useState(false);
     const { header, admin, formatDate } = useAdmin();
 
     const [attendanceList, setAttendanceList] = useState([]);
+    const [popup, setPop] = useState(null);
 
     const userId = admin.userId;
     const role = admin.role;
 
     const getAttendanceReport = async (year, month, studentClass, section) => {
         if (!userId && !role) return;
+        setLoading(true);
         try {
             const res = await axios.post(
                 API.HOST + API.GET_REPORT,
@@ -58,6 +61,8 @@ const Report = () => {
             } else {
                 alert(JSON.stringify(err));
             }
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -66,6 +71,7 @@ const Report = () => {
     }, [])
 
     const handleExportPDF = () => {
+        setPop({ title: "No Datas available to Export", type: "error" }); // error popup
         if (!attendanceList.length) return;
 
         const doc = new jsPDF("landscape");
@@ -113,14 +119,17 @@ const Report = () => {
         });
 
         doc.save("attendance-report.pdf");
+        setPop({ title: "Datas Exported Successfully", type: "success" }); // error popup
+
     };
 
     return (
         <>
-            <div className="fixed top-14 left-0 lg:left-55 right-0 bottom-0 overflow-y-auto bg-gray-50 p-6">
+            <div className="fixed top-14 left-0 lg:left-55 right-0 bottom-0 overflow-y-auto bg-gray-50 p-4 md:p-6">
+                {popup != null && <Popup tablePopUp={true} unmount={() => setPop(null)} title={popup.title} type={popup.type} />}
 
                 {/* Page Title */}
-                <h1 className="text-2xl font-semibold text-gray-800 mb-6">
+                <h1 className="text-lg md:text-2xl font-semibold text-sky-800 mb-4 md:mb-6">
                     Attendance Report
                 </h1>
 
@@ -221,50 +230,56 @@ const Report = () => {
                     </div>
                 </div>
 
-                {/* Table Section */}
-                <div className="bg-white rounded-lg shadow mb-6 overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                        <thead className="bg-gray-100">
-                            <tr>
-                                <th className="p-3 border">Student Name</th>
-                                <th className="p-3 border">Class</th>
-                                <th className="p-3 border">Section</th>
-                                <th className="p-3 border">Total Days</th>
-                                <th className="p-3 border">Present</th>
-                                <th className="p-3 border">Absent</th>
-                                <th className="p-3 border">Attendance %</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {attendanceList.length > 0 ? (
-                                attendanceList.map((item, index) => (
-                                    <tr key={index} className="hover:bg-gray-50">
-                                        <td className="p-3 border">{item.studentName}</td>
-                                        <td className="p-3 border">{item.class}</td>
-                                        <td className="p-3 border text-green-600">{item.section}</td>
-                                        <td className="p-3 border text-red-600">{item.totalDays}</td>
-                                        <td className="p-3 border">{item.presentDays}</td>
-                                        <td className="p-3 border">{item.absentDays}</td>
-                                        <td className="p-3 border text-green-600">{item.attendancePercentage}</td>
+                {loading ?
+                    (
+                        <div className="px-4 py-15 text-center text-gray-600">
+                            Loading...
+                        </div>
+                    ) : (
+                        < div className="bg-white rounded-lg shadow border border-gray-200 mb-6 overflow-x-auto">
+                            <table className="w-full text-left">
+                                <thead className="bg-sky-700 text-white">
+                                    <tr>
+                                        <th className="p-3 ">Student Name</th>
+                                        <th className="p-3 ">Class</th>
+                                        <th className="p-3 ">Section</th>
+                                        <th className="p-3 ">Total Days</th>
+                                        <th className="p-3 ">Present</th>
+                                        <th className="p-3 ">Absent</th>
+                                        <th className="p-3 text-right pr-5">Attendance %</th>
                                     </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td className="p-3 border text-center" colSpan="8">
-                                        No Data
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                                </thead>
+                                <tbody>
+                                    {attendanceList.length > 0 ? (
+                                        attendanceList.map((item, index) => (
+                                            <tr key={index} className="hover:bg-gray-50 border-b border-gray-300">
+                                                <td className="p-3 ">{item.studentName}</td>
+                                                <td className="p-3 ">{item.class}</td>
+                                                <td className="p-3  text-green-600">{item.section}</td>
+                                                <td className="p-3  text-red-600">{item.totalDays}</td>
+                                                <td className="p-3 ">{item.presentDays}</td>
+                                                <td className="p-3 ">{item.absentDays}</td>
+                                                <td className="p-3  text-green-600 text-right pr-5">{item.attendancePercentage}</td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td className="p-6 text-center text-gray-600" colSpan="8">
+                                                No Data
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
 
                 {/* Export Buttons */}
                 <div className="flex justify-end gap-3">
                     <Button
                         width="50"
                         label="Export PDF"
-                        className={`h-10`}
+                        className={`h-9 text-sm`}
                         onClick={() =>
                             openConfirm({
                                 title: "Export Report",
@@ -275,7 +290,7 @@ const Report = () => {
                     />
                 </div>
 
-            </div>
+            </div >
         </>
     )
 }

@@ -7,28 +7,41 @@ import Checkbox from "../../components/Common/CheckBox";
 
 // Utils
 import API from "../../../Utils/API";
-
+import navLinks from "../../../Utils/navLinks";
 // Hooks
 import useAdmin from "../../../Hooks/useAdmin";
+import { useNavigate } from "react-router-dom";
 
 const ViewAttendance = ({
     date
 }) => {
     const { header, admin, formatDate } = useAdmin();
+    const navigate = useNavigate();
 
     const [students, setStudents] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const getAttendanceByDate = async () => {
         if (!date) return;
+        setLoading(true);
+        try {
+            const res = await axios.post(
+                API.HOST + API.ATTENDANCE_DATA_BY_DATE,
+                { date: date, id: admin.userId },
+                header
+            );
 
-        const res = await axios.post(
-            API.HOST + API.ATTENDANCE_DATA_BY_DATE,
-            { date: date, id: admin.userId },
-            header
-        );
-
-        if (res.data.code === 200) {
-            setStudents(res.data.data);
+            if (res.data.code === 200) {
+                setStudents(res.data.data);
+            }
+        } catch (err) {
+            if (err.response && err.response.status === 401) {
+                navigate(navLinks.LOGIN); // <-- redirect to login page
+            } else {
+                alert(JSON.stringify(err));
+            }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -42,34 +55,41 @@ const ViewAttendance = ({
                 View Attendance - <span className="font-bold text-gray-600-">{formatDate(date)}</span>
             </h2>
 
-            <div className="border border-gray-200 shadow rounded-lg overflow-auto max-h-[400px]">
-                <table className="w-full">
-                    <thead className="bg-gray-200">
-                        <tr>
-                            <th className="border- p-2 text-start">Register No</th>
-                            <th className="border- p-2 text-start">Name</th>
-                            <th className="border- py-2 text-center">Attendance</th>
-                        </tr>
-                    </thead>
+            {loading ?
+                (
+                    <div className="px-4 py-15 text-center text-gray-600">
+                        Loading...
+                    </div>
+                ) : (
+                    <div className="border border-gray-200 shadow rounded-lg overflow-auto max-h-[400px]">
+                        <table className="w-full">
+                            <thead className="bg-sky-700 text-white">
+                                <tr>
+                                    <th className="border- p-2 px-2 text-start">Register No</th>
+                                    <th className="border- p-2 text-start">Name</th>
+                                    <th className="border- py-2 px-2 text-center">Attendance</th>
+                                </tr>
+                            </thead>
 
-                    <tbody>
-                        {students.map(student => (
-                            <tr key={student.id} className="border-b border-gray-300">
-                                <td className="p-2">
-                                    {student.registerNumber}
-                                </td>
-                                <td className=" p-2">
-                                    {student.name}
-                                </td>
-                                <td className={`p-2 flex justify-center 
+                            <tbody>
+                                {students.map(student => (
+                                    <tr key={student.id} className="border-b border-gray-300 text-gray-600">
+                                        <td className="p-2">
+                                            {student.registerNumber}
+                                        </td>
+                                        <td className=" p-2">
+                                            {student.name}
+                                        </td>
+                                        <td className={`p-2 flex justify-center 
                                     ${student.status === 1 ? "text-green-600" : "text-red-600"}`}>
-                                    {student.status === 1 ? "Present" : "Absent"}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                                            {student.status === 1 ? "Present" : "Absent"}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
 
         </div>
     );

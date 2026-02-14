@@ -29,6 +29,7 @@ const ManageStudent = ({
 }) => {
 
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
     const { header, admin, toLocalDate } = useAdmin();
     const { openNotification } = useOutletContext();
     const [popup, setPop] = useState(null);
@@ -128,21 +129,31 @@ const ManageStudent = ({
 
     const getStudentsById = async () => {
         if (!id) return;
+        setLoading(true);
+        try {
+            const res = await axios.post(
+                API.HOST + API.GET_STUDENT_BY_ID,
+                { id: id },
+                header
+            );
 
-        const res = await axios.post(
-            API.HOST + API.GET_STUDENT_BY_ID,
-            { id: id },
-            header
-        );
-
-        if (res.data.code === 200) {
-            formik.setFieldValue("firstName", res.data.data.firstName);
-            formik.setFieldValue("lastName", res.data.data.lastName);
-            formik.setFieldValue("dob", toLocalDate(res.data.data.dob));
-            formik.setFieldValue("gender", res.data.data.gender);
-            formik.setFieldValue("registerNumber", res.data.data.registerNumber);
-            formik.setFieldValue("class", res.data.data.class);
-            formik.setFieldValue("section", res.data.data.section);
+            if (res.data.code === 200) {
+                formik.setFieldValue("firstName", res.data.data.firstName);
+                formik.setFieldValue("lastName", res.data.data.lastName);
+                formik.setFieldValue("dob", toLocalDate(res.data.data.dob));
+                formik.setFieldValue("gender", res.data.data.gender);
+                formik.setFieldValue("registerNumber", res.data.data.registerNumber);
+                formik.setFieldValue("class", res.data.data.class);
+                formik.setFieldValue("section", res.data.data.section);
+            }
+        } catch (err) {
+            if (err.response && err.response.status === 401) {
+                navigate(navLinks.LOGIN); // <-- redirect to login page
+            } else {
+                alert(JSON.stringify(err));
+            }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -154,127 +165,134 @@ const ManageStudent = ({
         <div className="">
             <h2 className="text-xl font-semibold mb-4 text-sky-700 ">{id && id > 0 ? "Edit" : "Add"} Student</h2>
 
-            {/* Your existing form / UI */}
-            <form className="space-y-4 p-4 px-5 border border-gray-200 shadow-md rounded-lg overflow-auto" onSubmit={formik.handleSubmit}>
-                {popup != null && <Popup unmount={() => setPop(null)} title={popup.title} type={popup.type} />}
+            {loading ?
+                (
+                    <div className="px-4 py-15 text-center text-gray-600">
+                        Loading...
+                    </div>
+                ) : (
+                    <form className="space-y-4 p-4 px-5 border border-gray-200 shadow-md rounded-lg overflow-auto" onSubmit={formik.handleSubmit}>
+                        {popup != null && <Popup unmount={() => setPop(null)} title={popup.title} type={popup.type} />}
 
-                {/* border-gray-200 shadow-xl p-10"> */}
-                <TextField
-                    label="First Name"
-                    name="firstName"
-                    type="text"
-                    placeholder="Enter your First Name"
-                    flex="flex flex-col md:flex-row md:items-center"
-                    value={formik.values.firstName}
-                    error={formik.errors.firstName}
-                    onChange={(e) => formik.setFieldValue("firstName", e, true)}
-                    required
-                />
+                        {/* border-gray-200 shadow-xl p-10"> */}
+                        <TextField
+                            label="First Name"
+                            name="firstName"
+                            type="text"
+                            placeholder="Enter your First Name"
+                            flex="flex flex-col md:flex-row md:items-center"
+                            value={formik.values.firstName}
+                            error={formik.errors.firstName}
+                            onChange={(e) => formik.setFieldValue("firstName", e, true)}
+                            required
+                        />
 
-                <TextField
-                    label="Last Name"
-                    name="lastName"
-                    type="text"
-                    placeholder="Enter your Last Name"
-                    flex="flex flex-col md:flex-row md:items-center"
-                    value={formik.values.lastName}
-                    error={formik.errors.lastName}
-                    onChange={(e) => formik.setFieldValue("lastName", e)}
-                />
+                        <TextField
+                            label="Last Name"
+                            name="lastName"
+                            type="text"
+                            placeholder="Enter your Last Name"
+                            flex="flex flex-col md:flex-row md:items-center"
+                            value={formik.values.lastName}
+                            error={formik.errors.lastName}
+                            onChange={(e) => formik.setFieldValue("lastName", e)}
+                        />
 
-                <DateField
-                    label="Date of Birth"
-                    name="dob"
-                    flex="flex flex-col md:flex-row md:items-center"
-                    value={formik.values.dob}
-                    error={formik.errors.dob}
-                    onChange={(e) => formik.setFieldValue("dob", e)}
-                />
+                        <DateField
+                            label="Date of Birth"
+                            name="dob"
+                            flex="flex flex-col md:flex-row md:items-center"
+                            value={formik.values.dob}
+                            error={formik.errors.dob}
+                            onChange={(e) => formik.setFieldValue("dob", e)}
+                        />
 
-                <Dropdown
-                    label="Gender"
-                    name="gender"
-                    flex="flex flex-col md:flex-row md:items-center"
-                    value={formik.values.gender}
-                    error={formik.errors.gender}
-                    onChange={(e) => formik.setFieldValue("gender", e)}
-                    placeholder="Select gender"
-                    options={[
-                        { label: "Male", value: "MALE" },
-                        { label: "Female", value: "FEMALE" },
-                        { label: "Other", value: "OTHER" },
-                    ]}
-                    required
-                />
+                        <Dropdown
+                            label="Gender"
+                            name="gender"
+                            flex="flex flex-col md:flex-row md:items-center"
+                            value={formik.values.gender}
+                            error={formik.errors.gender}
+                            onChange={(e) => formik.setFieldValue("gender", e)}
+                            placeholder="Select gender"
+                            options={[
+                                { label: "Male", value: "MALE" },
+                                { label: "Female", value: "FEMALE" },
+                                { label: "Other", value: "OTHER" },
+                            ]}
+                            required
+                        />
 
-                <TextField
-                    label="Register Number"
-                    name="registerNumber"
-                    type="text"
-                    placeholder="Enter Register Number"
-                    flex="flex flex-col md:flex-row md:items-center"
-                    value={formik.values.registerNumber}
-                    error={formik.errors.registerNumber}
-                    onChange={(e) => formik.setFieldValue("registerNumber", e)}
-                    required
-                />
+                        <TextField
+                            label="Register Number"
+                            name="registerNumber"
+                            type="text"
+                            placeholder="Enter Register Number"
+                            flex="flex flex-col md:flex-row md:items-center"
+                            value={formik.values.registerNumber}
+                            error={formik.errors.registerNumber}
+                            onChange={(e) => formik.setFieldValue("registerNumber", e)}
+                            required
+                        />
 
-                <Dropdown
-                    label="Class"
-                    name="class"
-                    flex="flex flex-col md:flex-row md:items-center"
-                    value={formik.values.class}
-                    error={formik.errors.class}
-                    onChange={(e) => formik.setFieldValue("class", e)}
-                    placeholder="Select class"
-                    options={[
-                        { label: "1", value: 1 },
-                        { label: "2", value: 2 },
-                        { label: "3", value: 3 },
-                        { label: "4", value: 4 },
-                        { label: "5", value: 5 },
-                        { label: "6", value: 6 },
-                        { label: "7", value: 7 },
-                        { label: "8", value: 8 },
-                        { label: "9", value: 9 },
-                        { label: "10", value: 10 },
-                        { label: "11", value: 11 },
-                        { label: "12", value: 12 },
-                    ]}
-                    required
-                />
+                        <Dropdown
+                            label="Class"
+                            name="class"
+                            flex="flex flex-col md:flex-row md:items-center"
+                            value={formik.values.class}
+                            error={formik.errors.class}
+                            onChange={(e) => formik.setFieldValue("class", e)}
+                            placeholder="Select class"
+                            options={[
+                                { label: "1", value: 1 },
+                                { label: "2", value: 2 },
+                                { label: "3", value: 3 },
+                                { label: "4", value: 4 },
+                                { label: "5", value: 5 },
+                                { label: "6", value: 6 },
+                                { label: "7", value: 7 },
+                                { label: "8", value: 8 },
+                                { label: "9", value: 9 },
+                                { label: "10", value: 10 },
+                                { label: "11", value: 11 },
+                                { label: "12", value: 12 },
+                            ]}
+                            required
+                        />
 
-                <Dropdown
-                    label="Section"
-                    name="section"
-                    flex="flex flex-col md:flex-row md:items-center"
-                    value={formik.values.section}
-                    error={formik.errors.section}
-                    onChange={(e) => formik.setFieldValue("section", e)}
-                    placeholder="Select Section"
-                    options={[
-                        { label: "A", value: "A" },
-                        { label: "B", value: "B" },
-                        { label: "C", value: "C" },
-                        { label: "D", value: "D" }
-                    ]}
-                    required
-                />
+                        <Dropdown
+                            label="Section"
+                            name="section"
+                            flex="flex flex-col md:flex-row md:items-center"
+                            value={formik.values.section}
+                            error={formik.errors.section}
+                            onChange={(e) => formik.setFieldValue("section", e)}
+                            placeholder="Select Section"
+                            options={[
+                                { label: "A", value: "A" },
+                                { label: "B", value: "B" },
+                                { label: "C", value: "C" },
+                                { label: "D", value: "D" }
+                            ]}
+                            required
+                        />
 
-                <div className="space-y-3 md:flex md:items-center space-x-5 mt-5">
-                    <Button
-                        label="Cancel"
-                        bgAndTextColor="bg-gray-200 text-gray-900"
-                        onClick={closePopup}
-                    />
+                        <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-5 mt-5">
+                            <Button
+                                label="Cancel"
+                                bgAndTextColor="bg-gray-200 text-gray-900"
+                                onClick={closePopup}
+                            />
 
-                    <Button
-                        label="Submit"
-                        type="submit"
-                    />
-                </div>
+                            <Button
+                                label="Submit"
+                                type="submit"
+                            />
+                        </div>
 
-            </form>
+                    </form>
+                )}
+
         </div>
     );
 };

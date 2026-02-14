@@ -126,8 +126,6 @@ const Login = () => {
                 // alert(JSON.stringify(err));
                 setBtnLoading(false);
                 console.log(JSON.stringify(err));
-                // alert(JSON.stringify(data.message));
-                setPop({ title: data.message, type: "error" });
             }
         }
     };
