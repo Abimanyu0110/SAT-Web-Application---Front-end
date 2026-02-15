@@ -1,28 +1,28 @@
-import { useState, useEffect, use } from "react"
+import { useState } from "react"
 
-// ------------- Components ------------------
-// import Table from "../../components/Common/Table";
+// Components
 import { Modal } from "../../components/Common/Modal";
-import ManageStudent from "./ManageStudent";
-import TableNew from "../../components/Common/TableNew";
+import Table from "../../components/Common/Table";
 
-// -------------- Utils -------------------
+// Utils
 import API from "../../../Utils/API";
 
-// -------------- Hooks -----------------
+// Hooks
 import useAdmin from "../../../Hooks/useAdmin";
+
+// Pages
 import ViewStudent from "./ViewStudent";
+import ManageStudent from "./ManageStudent";
 
 const StudentsList = () => {
 
-    const { admin } = useAdmin();
-    const [refreshKey, setRefreshKey] = useState(0);
+    const { admin } = useAdmin(); // useAdmin Hooks
+    const [refreshKey, setRefreshKey] = useState(0); // For Table refresh
 
     const [popupManage, setPopupManage] = useState({ show: false, id: 0 })
     const [popupView, setPopupView] = useState({ show: false, id: 0 })
 
     const handleSuccess = () => {
-        // setPopupManage({ show: false });                 // close modal
         setRefreshKey(prev => prev + 1);     // refresh table
     };
 
@@ -44,13 +44,16 @@ const StudentsList = () => {
                 <ViewStudent id={popupView.id} />
             </Modal>
 
-            <div className="fixed top-14 left-0 lg:left-55 right-0 bottom-0 bg-amber-300">
+            <div className="fixed top-14 left-0 lg:left-55 right-0 bottom-0">
 
-                <TableNew
+                <Table
                     title="Students"
                     refreshKey={refreshKey}
                     apiURL={API.HOST + API.STUDENTS_LIST}
+                    deleteUrl={API.HOST + API.DELETE_DATA}
+                    targetTable={"students"}
                     limit={10}
+                    searchPlaceholder="Search name, register number, class, section or gender"
                     columns={[
                         { label: "S.no", key: "sno" },
                         { label: "Name", key: "name" },
@@ -71,6 +74,7 @@ const StudentsList = () => {
                             gender: r.gender,
                         }))
                     }
+                    // Below three Buttons were only visible for ADMIN roles
                     showAdd={admin.role === "ADMIN"}
                     showDelete={admin.role === "ADMIN"}
                     showEdit={admin.role === "ADMIN"}
@@ -78,7 +82,6 @@ const StudentsList = () => {
                     addClick={() => setPopupManage({ show: true })}
                     viewClick={(row) => setPopupView({ show: true, id: row.id })}
                     editClick={(row) => setPopupManage({ show: true, id: row.id })}
-                    deleteClick={(row) => console.log("Delete", row)}
                 />
             </div>
 

@@ -1,4 +1,7 @@
+// icons
 import { RiMenu4Fill } from "react-icons/ri";
+
+// Hooks
 import useAdmin from "../../Hooks/useAdmin";
 
 const Navbar = ({ setSidebarOpen }) => {

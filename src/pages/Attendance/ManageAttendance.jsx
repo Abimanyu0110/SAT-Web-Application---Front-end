@@ -4,6 +4,7 @@ import axios from "axios";
 // Components
 import Button from "../../components/Common/Button";
 import Checkbox from "../../components/Common/CheckBox";
+import { Popup } from "../../components/Common/Popup";
 
 // Utils
 import API from "../../../Utils/API";
@@ -16,28 +17,32 @@ import { useNavigate } from "react-router-dom";
 const ManageAttendance = ({
     closePopup,
     onSuccess,
-    selectedDate, // 👈 optional (edit mode)
+    selectedDate,
 }) => {
-    const { header, admin } = useAdmin();
-    const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
-    const [students, setStudents] = useState([]);
-    const [attendance, setAttendance] = useState({});
+    const navigate = useNavigate(); // useNavigate
+    const { header, admin } = useAdmin(); // useAdmin Hook
+
+    const [loading, setLoading] = useState(false); // For Loader
+    const [btnLoading, setBtnLoading] = useState(false); // For Button Loader
+    const [students, setStudents] = useState([]); // For Store Student Datas from DB
+    const [attendance, setAttendance] = useState({}); // For Store Attendance Data from DB
+    const [popup, setPop] = useState(null); // For Popup message
 
     const isEdit = false;
-    /* =========================
-       FETCH STUDENTS
-    ========================== */
+
+    // Get Student List from DB
     const getStudentsList = async () => {
         setLoading(true);
         try {
-            const res = await axios.post(
+            const res = await axios.get(
                 API.HOST + API.STUDENTS_LIST,
                 {
-                    id: admin.userId,
-                    role: admin.role
-                },
-                header
+                    params: {
+                        id: admin.userId,
+                        role: admin.role
+                    },
+                    ...header
+                }
             );
 
             if (res.data.code === 200) {
@@ -55,43 +60,45 @@ const ManageAttendance = ({
                 });
             }
         } catch (err) {
-            if (err.response && err.response.status === 401) {
-                navigate(navLinks.LOGIN); // <-- redirect to login page
+            if (err.response && err.response.status === 401) { // Auth error
+                navigate(navLinks.LOGIN); // redirect to login page
             } else {
-                alert(JSON.stringify(err));
+                setPop({ title: "Couldn't able to get Student Datas", type: "error" }); // error popup
             }
         } finally {
-            // setLoading(false);
+            setLoading(false);
         }
     };
 
-    /* =========================
-       FETCH ATTENDANCE (EDIT)
-    ========================== */
+
+    // Get Attendance Data from DB
     const getAttendanceByDate = async () => {
         if (!selectedDate) return;
 
         try {
-            const res = await axios.post(
+            const res = await axios.get(
                 API.HOST + API.ATTENDANCE_DATA_BY_DATE,
-                { date: selectedDate, id: admin.userId },
-                header
+                {
+                    params: {
+                        date: selectedDate,
+                        id: admin.userId
+                    },
+                    ...header
+                }
             );
 
             if (res.data.code === 200) {
-                // alert(JSON.stringify(res.data.data))
                 const map = {};
                 res.data.data.forEach(a => {
                     map[a.studentId] = a.status === 1;
                 });
-                // alert(JSON.stringify(map))
                 setAttendance(prev => ({ ...prev, ...map }));
             }
         } catch (err) {
-            if (err.response && err.response.status === 401) {
-                navigate(navLinks.LOGIN); // <-- redirect to login page
+            if (err.response && err.response.status === 401) { // Auth error
+                navigate(navLinks.LOGIN); // redirect to login page
             } else {
-                alert(JSON.stringify(err));
+                setPop({ title: "Couldn't able to get Attendance Datas", type: "error" }); // error popup
             }
         } finally {
             setLoading(false);
@@ -109,44 +116,47 @@ const ManageAttendance = ({
     }, [selectedDate]);
 
 
-    /* =========================
-       CHECKBOX HANDLER
-    ========================== */
+    // CheckBox Handler
     const handleAttendanceChange = (id, value) => {
         setAttendance(prev => ({ ...prev, [id]: value }));
     };
 
-    /* =========================
-       SUBMIT
-    ========================== */
+
+    // Attendance Submit
     const handleSubmit = async () => {
         const payload = students.map(s => ({
             studentId: s.id,
             isPresent: attendance[s.id]
         }));
 
-        // alert(JSON.stringify(payload))
-        // return
-        const res = await axios.post(
-            API.HOST + API.MANAGE_ATTENDANCE,
-            {
-                isEdit: isEdit,
-                date: selectedDate || new Date().toISOString().split("T")[0],
-                markedBy: admin.userId,
-                attendance: payload
-            },
-            header
-        );
+        try {
+            setBtnLoading(true);
+            const res = await axios.post(
+                API.HOST + API.MANAGE_ATTENDANCE,
+                {
+                    isEdit: isEdit,
+                    date: selectedDate || new Date().toISOString().split("T")[0],
+                    markedBy: admin.userId,
+                    attendance: payload
+                },
+                header
+            );
 
-        if (res.data.code === 200) {
-            alert(res.data.message);
-            closePopup();
-            onSuccess();
+            if (res.data.code === 200) {
+                setPop({ title: res.data.message, type: "success" }); // success popup
+                closePopup(); // For Close the Attendance popup
+                onSuccess(); // For Table Refresh
+            }
+        } catch (error) {
+            setPop({ title: "Couldn't able to submit", type: "error" }); // error popup
+        } finally {
+            setBtnLoading(false);
         }
     };
 
     return (
         <div>
+            {popup != null && <Popup unmount={() => setPop(null)} title={popup.title} type={popup.type} />}
             <h2 className="text-xl font-semibold mb-4 text-sky-700">
                 {selectedDate ? "Edit Attendance" : "Mark Attendance"}
             </h2>

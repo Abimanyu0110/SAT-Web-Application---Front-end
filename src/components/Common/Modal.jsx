@@ -39,7 +39,7 @@ export const Modal = ({
         {/* Close Button */}
         <button
           onClick={handleClose}
-          className="absolute top-4 right-2 text-2xl rounded-lg bg-gray-100 hover:bg-gray-200 p-1 text-gray-500 cursor-pointer hover:text-gray-800"
+          className="absolute top-4 right-2 lg:right-5 text-2xl rounded-lg bg-gray-100 hover:bg-gray-200 p-1 text-gray-500 cursor-pointer hover:text-gray-800"
         >
           <IoCloseOutline />
         </button>

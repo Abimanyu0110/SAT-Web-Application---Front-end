@@ -1,24 +1,15 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 
+// Pages
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
+
+// Components
 import ConfirmDialog from "../components/Common/ConfirmDialog";
-import Notification from "../components/Common/Notification";
 
 function Layout() {
-    const [sidebarOpen, setSidebarOpen] = useState(false);
-
-    // Notification
-    const [notify, setNotify] = useState({
-        isOpen: false,
-        type: "success",
-        message: "",
-    });
-
-    const closeNotification = () => {
-        setNotify(prev => ({ ...prev, isOpen: false }));
-    };
+    const [sidebarOpen, setSidebarOpen] = useState(false); // SideBar
 
     // Confirm dialog
     const [showConfirm, setShowConfirm] = useState(false);
@@ -40,12 +31,6 @@ function Layout() {
 
     return (
         <>
-            <Notification
-                isOpen={notify.isOpen}
-                type={notify.type}
-                message={notify.message}
-                onClose={closeNotification}
-            />
 
             <div className="flex min-h-screen bg-white">
                 {/* Sidebar */}
@@ -65,6 +50,7 @@ function Layout() {
                 </div>
             </div>
 
+            {/* Comfirm Dialog */}
             {showConfirm && (
                 <ConfirmDialog
                     isOpen={showConfirm}

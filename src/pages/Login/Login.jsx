@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import * as yup from "yup";
 import axios from "axios";
-import { useOutletContext } from "react-router-dom";
 
 // ---------------- Components --------------------
 import TextField from "../../components/Common/TextField";
@@ -19,11 +18,12 @@ import useAdmin from "../../../Hooks/useAdmin";
 
 const Login = () => {
 
-    const [adminLogin, setAdminLogin] = useState(true);
-    const { header } = useAdmin();
-    const navigate = useNavigate();
-    const [popup, setPop] = useState(null);
-    const [btnLoading, setBtnLoading] = useState(false);
+    const { header } = useAdmin(); // useAdmin Hooks
+    const navigate = useNavigate(); // useNavigate()
+
+    const [adminLogin, setAdminLogin] = useState(true); // For Admin/Teacher Login
+    const [popup, setPop] = useState(null); // For Popup message
+    const [btnLoading, setBtnLoading] = useState(false); // For Button login
 
     // Form state
     const [formData, setFormData] = useState({
@@ -95,7 +95,6 @@ const Login = () => {
             const { data } = await axios.post(API.HOST + API.LOGIN, payload, header);
 
             if (data.code === 200) {
-                // alert(data.message);
                 setPop({ title: data.message, type: "success" }); // Success popup
 
                 setFormData({ email: "", password: "", secretCode: "" });
@@ -110,7 +109,7 @@ const Login = () => {
                 else navigate(navLinks.DASHBOARD_TEACHER);
             } else {
                 setBtnLoading(false);
-                setPop({ title: data.message, type: "error" }); // Success popup
+                setPop({ title: data.message, type: "error" }); // error popup
             }
         } catch (err) {
             // Collect validation errors
@@ -122,10 +121,8 @@ const Login = () => {
                 setErrors(validationErrors);
                 setBtnLoading(false);
             } else {
-                // alert("There was an error submitting the form.");
-                // alert(JSON.stringify(err));
                 setBtnLoading(false);
-                console.log(JSON.stringify(err));
+                setPop({ title: "There was an error in login.", type: "error" }); // Success popup
             }
         }
     };

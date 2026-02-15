@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 // Components
 import Button from "../../components/Common/Button";
+import { Popup } from "../../components/Common/Popup";
 
 // Utils
 import API from "../../../Utils/API";
@@ -14,35 +15,39 @@ import useAdmin from "../../../Hooks/useAdmin";
 
 const DashboardTeacher = () => {
 
-    const navigate = useNavigate();
-    const { header, admin, formatDate } = useAdmin();
-    const [teacherDatas, setTeacherDatas] = useState();
-    const [attendanceList, setAttendanceList] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const id = admin.userId;
+    const navigate = useNavigate(); // useNavigate()
+    const { header, admin, formatDate } = useAdmin(); // useAdmin Hook
 
+    const [teacherDatas, setTeacherDatas] = useState(); // For storing teacher datas from DB
+    const [attendanceList, setAttendanceList] = useState([]); // For storing attendance List from DB
+    const [loading, setLoading] = useState(false); // For Loading
+    const [popup, setPop] = useState(null); // For Popup message
+    const id = admin.userId; // userId from admin Hooks
+
+    // Get Dashboard Datas from DB
     const getTeacherDashboard = async () => {
         if (!id) return;
         setLoading(true);
         try {
-            const res = await axios.post(
+            const res = await axios.get(
                 API.HOST + API.GET_TEACHER_DASHOARD,
-                { id: id },
-                header
+                {
+                    params: { id: id },
+                    ...header
+                }
             );
             const data = res.data.data;
 
             if (res.data.code === 200) {
-                // alert(JSON.stringify(data.teacherDatas))
                 setTeacherDatas(data.teacherDatas || "");
                 setAttendanceList(data.attendanceList || []);
             }
         }
         catch (err) {
-            if (err.response && err.response.status === 401) {
-                navigate(navLinks.LOGIN); // <-- redirect to login page
+            if (err.response && err.response.status === 401) { // Auth error
+                navigate(navLinks.LOGIN); // redirect to login page
             } else {
-                alert(JSON.stringify(err));
+                setPop({ title: "Couldn't able to get Datas", type: "error" }); // error popup
             }
         } finally {
             setLoading(false);
@@ -55,6 +60,7 @@ const DashboardTeacher = () => {
 
     return (
         <>
+            {popup != null && <Popup unmount={() => setPop(null)} title={popup.title} type={popup.type} />}
             {loading ?
                 (
                     <div className="text-gray-600 bg-gray-50 flex items-center justify-center h-full md:text-2xl md:font-semibold">

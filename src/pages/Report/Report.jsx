@@ -3,12 +3,10 @@ import axios from "axios";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { Navigate } from "react-router-dom";
 
 // Components
 import Dropdown from "../../components/Common/Dropdown";
 import Button from "../../components/Common/Button";
-import ConfirmDialog from "../../components/Common/ConfirmDialog";
 import { Popup } from "../../components/Common/Popup";
 
 // Utils
@@ -20,34 +18,46 @@ import useAdmin from "../../../Hooks/useAdmin";
 
 const Report = () => {
 
-    const { openConfirm } = useOutletContext();
-    const navigate = useNavigate();
-    const [month, setMonth] = useState("");
-    const [year, setYear] = useState("");
-    const [studentClass, setStudentClass] = useState("");
-    const [section, setSection] = useState("");
-    const [loading, setLoading] = useState(false);
-    const { header, admin, formatDate } = useAdmin();
+    const { openConfirm } = useOutletContext(); // For Dialog Box
+    const navigate = useNavigate(); // useNavigate()
+    const { header, admin, formatDate } = useAdmin(); // useAdmin Hooks
 
-    const [attendanceList, setAttendanceList] = useState([]);
-    const [popup, setPop] = useState(null);
+    // For Filter Values
+    const [month, setMonth] = useState();
+    const [year, setYear] = useState();
+    const [studentClass, setStudentClass] = useState();
+    const [section, setSection] = useState("");
+
+    const [loading, setLoading] = useState(false); // For Loading
+
+    const [attendanceList, setAttendanceList] = useState([]); // For Store Attendance List
+    const [popup, setPop] = useState(null); // For Popup messages
 
     const userId = admin.userId;
     const role = admin.role;
 
+    // Get Datas from DB
     const getAttendanceReport = async (year, month, studentClass, section) => {
         if (!userId && !role) return;
         setLoading(true);
         try {
-            const res = await axios.post(
+            const res = await axios.get(
                 API.HOST + API.GET_REPORT,
-                { userId: userId, role: role, year, month, studentClass, section },
-                header
+                {
+                    params: {
+                        userId: userId,
+                        role: role,
+                        year,
+                        month,
+                        studentClass,
+                        section
+                    },
+                    ...header
+                }
             );
             const data = res.data.data;
 
             if (res.data.code === 200) {
-                // alert(JSON.stringify(data))
                 setAttendanceList(data || []);
                 if (data?.length > 0 && role === "TEACHER") {
                     setStudentClass(data[0].class);
@@ -56,10 +66,10 @@ const Report = () => {
             }
         }
         catch (err) {
-            if (err.response && err.response.status === 401) {
-                navigate(navLinks.LOGIN); // <-- redirect to login page
+            if (err.response && err.response.status === 401) { // Auth Error
+                navigate(navLinks.LOGIN); // redirect to login page
             } else {
-                alert(JSON.stringify(err));
+                setPop({ title: "Unable to get Data", type: "error" }); // error popup
             }
         } finally {
             setLoading(false);
@@ -71,8 +81,10 @@ const Report = () => {
     }, [])
 
     const handleExportPDF = () => {
-        setPop({ title: "No Datas available to Export", type: "error" }); // error popup
-        if (!attendanceList.length) return;
+        if (!attendanceList.length) {
+            setPop({ title: "No Datas available to Export", type: "error" }); // error popup
+            return;
+        }
 
         const doc = new jsPDF("landscape");
 
@@ -101,6 +113,7 @@ const Report = () => {
             "Attendance %"
         ];
 
+        // ----- Data Assigning ---------
         const rows = attendanceList.map(item => [
             item.studentName,
             item.class,
@@ -119,7 +132,7 @@ const Report = () => {
         });
 
         doc.save("attendance-report.pdf");
-        setPop({ title: "Datas Exported Successfully", type: "success" }); // error popup
+        setPop({ title: "Datas Exported Successfully", type: "success" }); // success popup
 
     };
 
@@ -141,21 +154,18 @@ const Report = () => {
                             label="Year"
                             name="year"
                             value={year}
-                            // error={formik.errors.gender}
                             onChange={(e) => setYear(e)}
                             placeholder="Select Year"
                             options={[
                                 { label: "2026", value: 2026 },
                                 { label: "2025", value: 2025 },
                             ]}
-                            required
                         />
 
                         <Dropdown
                             label="Month"
                             name="month"
                             value={month}
-                            // error={formik.errors.gender}
                             onChange={(e) => setMonth(e)}
                             placeholder="Select Month"
                             options={[
@@ -172,7 +182,6 @@ const Report = () => {
                                 { label: "November", value: 11 },
                                 { label: "December", value: 12 },
                             ]}
-                            required
                         />
 
                         {role === "ADMIN" && <>
@@ -180,7 +189,6 @@ const Report = () => {
                                 label="Class"
                                 name="class"
                                 value={studentClass}
-                                // error={formik.errors.class}
                                 onChange={(e) => setStudentClass(e)}
                                 placeholder="Select class"
                                 options={[
@@ -197,14 +205,12 @@ const Report = () => {
                                     { label: "XI", value: 11 },
                                     { label: "XII", value: 12 },
                                 ]}
-                                required
                             />
 
                             <Dropdown
                                 label="Section"
                                 name="section"
                                 value={section}
-                                // error={formik.errors.section}
                                 onChange={(e) => setSection(e)}
                                 placeholder="Select Section"
                                 options={[
@@ -213,7 +219,6 @@ const Report = () => {
                                     { label: "C", value: "C" },
                                     { label: "D", value: "D" }
                                 ]}
-                                required
                             />
                         </>}
 
@@ -222,14 +227,13 @@ const Report = () => {
                                 label="View Report"
                                 className={`h-10`}
                                 onClick={() => { getAttendanceReport(year, month, studentClass, section) }}
-                            // bgAndTextColor="bg-gray-200 text-gray-900"
-                            // onClick={closePopup}
                             />
                         </div>
 
                     </div>
                 </div>
 
+                {/* Loading + Table */}
                 {loading ?
                     (
                         <div className="px-4 py-15 text-center text-gray-600">

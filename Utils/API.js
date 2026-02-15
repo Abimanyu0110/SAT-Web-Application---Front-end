@@ -11,6 +11,8 @@ const API = {
     GET_TEACHER_DASHOARD: "/api/admin/getTeacherDashboard",
     GET_ADMIN_DASHOARD: "/api/admin/getAdminDashboard",
 
+    DELETE_DATA: "/api/admin/deleteDataById",
+
     // --------------- Report ----------------------
     GET_REPORT: "/api/admin/getAttendanceReport",
 

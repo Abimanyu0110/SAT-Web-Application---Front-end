@@ -1,17 +1,15 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 
-// ------------- Components ------------------
-// import Table from "../../components/Common/Table";
+// Components
 import { Modal } from "../../components/Common/Modal";
-import TableNew from "../../components/Common/TableNew";
+import Table from "../../components/Common/Table";
+
+// Pages
 import ManageAttendance from "./ManageAttendance";
 import ViewAttendance from "./ViewAttendance";
 
-// ------------- Utils -----------------------
+// Utils
 import API from "../../../Utils/API";
-
-// ------------- Hooks -----------------------
-import useAdmin from "../../../Hooks/useAdmin";
 
 const AttendanceList = () => {
 
@@ -23,14 +21,11 @@ const AttendanceList = () => {
         return `${year}-${month}-${day}`;
     };
 
-    const { header, admin, formatDate } = useAdmin();
-
-    const [open, setOpen] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
-    const [popupManage, setPopupManage] = useState({ show: false, date: "" });
-    const [popupView, setPopupView] = useState({ show: false, date: "" });
+    const [popupManage, setPopupManage] = useState({ show: false, date: "" }); // For Add/Edit
+    const [popupView, setPopupView] = useState({ show: false, date: "" }); // For View
 
-    const [showAdd, setShowAdd] = useState(true);
+    const [showAdd, setShowAdd] = useState(true); // For Prevent Duplicates
 
     const getTodayDate = () => {
         return new Date().toISOString().split("T")[0];
@@ -39,13 +34,13 @@ const AttendanceList = () => {
     const today = getTodayDate();
 
     const handleSuccess = () => {
-        setPopupManage({ show: false, date: "" });                 // close modal
-        setRefreshKey(prev => prev + 1);     // refresh table
+        setPopupManage({ show: false, date: "" }); // close modal
+        setRefreshKey(prev => prev + 1); // refresh table
     };
 
     return (
         <>
-            {/* Manage Attendance */}
+            {/* Add + Edit Attendance */}
             <Modal
                 show={popupManage.show}
                 closePopup={() => setPopupManage({ show: false })}
@@ -63,10 +58,11 @@ const AttendanceList = () => {
 
             <div className="fixed top-14 left-0 lg:left-55 right-0 bottom-0 bg-amber-300">
 
-                <TableNew
+                <Table
                     title="Attendance"
                     refreshKey={refreshKey}
                     apiURL={API.HOST + API.ATTENDANCE_LIST_BY_DATE}
+                    searchPlaceholder="Search date, eg. 14-02-2026"
                     limit={10}
                     columns={[
                         { label: "S.no", key: "sno" },
@@ -89,8 +85,8 @@ const AttendanceList = () => {
                             totalAbsent: r.totalAbsent
                         }));
                     }}
-                    showDelete={false}
-                    showAdd={showAdd}
+                    showDelete={false} // Data Deletion not allowed
+                    showAdd={showAdd} // Duplicate Checks
                     addClick={() => setPopupManage({ show: true, date: "" })}
                     viewClick={(row) => setPopupView({ show: true, date: row.date })}
                     editClick={(row) => setPopupManage({ show: true, date: row.date })}

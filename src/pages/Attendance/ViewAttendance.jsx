@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 // Components
-import Button from "../../components/Common/Button";
-import Checkbox from "../../components/Common/CheckBox";
+import { Popup } from "../../components/Common/Popup";
 
 // Utils
 import API from "../../../Utils/API";
@@ -15,30 +14,37 @@ import { useNavigate } from "react-router-dom";
 const ViewAttendance = ({
     date
 }) => {
-    const { header, admin, formatDate } = useAdmin();
-    const navigate = useNavigate();
+    const navigate = useNavigate(); // useNavigate()
+    const { header, admin, formatDate } = useAdmin(); // useAdmin hook
 
-    const [students, setStudents] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [attendanceDatas, setAttendanceDatas] = useState([]); // For Store student attendance Datas from DB
+    const [loading, setLoading] = useState(false); // For Loader
+    const [popup, setPop] = useState(null); // For Popup message
 
+    // Get Attendance Datas from DB
     const getAttendanceByDate = async () => {
         if (!date) return;
         setLoading(true);
         try {
-            const res = await axios.post(
+            const res = await axios.get(
                 API.HOST + API.ATTENDANCE_DATA_BY_DATE,
-                { date: date, id: admin.userId },
-                header
+                {
+                    params: {
+                        date: date,
+                        id: admin.userId
+                    },
+                    ...header
+                }
             );
 
             if (res.data.code === 200) {
-                setStudents(res.data.data);
+                setAttendanceDatas(res.data.data);
             }
         } catch (err) {
-            if (err.response && err.response.status === 401) {
-                navigate(navLinks.LOGIN); // <-- redirect to login page
+            if (err.response && err.response.status === 401) { // Auth error
+                navigate(navLinks.LOGIN); // redirect to login page
             } else {
-                alert(JSON.stringify(err));
+                setPop({ title: "Couldn't able to get Datas", type: "error" }); // error popup
             }
         } finally {
             setLoading(false);
@@ -51,6 +57,7 @@ const ViewAttendance = ({
 
     return (
         <div>
+            {popup != null && <Popup unmount={() => setPop(null)} title={popup.title} type={popup.type} />}
             <h2 className="text-xl font-semibold mb-4 text-sky-700">
                 View Attendance - <span className="font-bold text-gray-600-">{formatDate(date)}</span>
             </h2>
@@ -72,7 +79,7 @@ const ViewAttendance = ({
                             </thead>
 
                             <tbody>
-                                {students.map(student => (
+                                {attendanceDatas.map(student => (
                                     <tr key={student.id} className="border-b border-gray-300 text-gray-600">
                                         <td className="p-2">
                                             {student.registerNumber}

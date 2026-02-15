@@ -4,19 +4,18 @@ import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import axios from "axios";
-import Cookies from "js-cookie";
 
-// -------------- Components ---------------------
+// Components 
 import TextField from "../../components/Common/TextField";
 import Button from "../../components/Common/Button";
 import Dropdown from "../../components/Common/Dropdown";
-import DateField from "../../components/Common/DateField";
+import { Popup } from "../../components/Common/Popup";
 
-// -------------- Utils ------------------------
+// Utils
 import navLinks from "../../../Utils/navLinks";
 import API from "../../../Utils/API";
 
-// -------------- Hooks ---------------------
+// Hooks
 import useAdmin from "../../../Hooks/useAdmin";
 
 const ManageTeacher = ({
@@ -25,15 +24,18 @@ const ManageTeacher = ({
     id
 }) => {
 
-    const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
-    const { header, admin, toLocalDate } = useAdmin();
+    const navigate = useNavigate(); // useNavigate
+    const { header, admin, toLocalDate } = useAdmin(); // useAdmin Hooks
+
+    const [loading, setLoading] = useState(false); // For Loading
+    const [btnLoading, setBtnLoading] = useState(false); // For Button Loading
+    const [popup, setPop] = useState(null); // For Popup messages
+
     const role = "TEACHER";
-    const adminId = Cookies.get("userId")
+    const adminId = admin.userId;
 
     const formik = useFormik({
         initialValues: {
-            // id: null,
             firstName: "",
             lastName: "",
             dob: "",
@@ -43,7 +45,10 @@ const ManageTeacher = ({
             confirmPassword: "",
             organizationName: "",
             secretCode: "",
-            role: role
+            role: role,
+            class: "",
+            section: "",
+            subject: "",
         },
         validateOnMount: false,
         validateOnBlur: false,
@@ -62,7 +67,17 @@ const ManageTeacher = ({
                 .matches(/^[A-Za-z\s]+$/, "Letters Only")
                 .notRequired(),
             dob: yup
-                .date()
+                .string()
+                .test(
+                    "year-range",
+                    "Year must be between 1900 and 2099",
+                    (value) => {
+                        if (!value) return true;
+
+                        const year = parseInt(value.split("-")[0]);
+                        return year >= 1900 && year <= 2099;
+                    }
+                )
                 .notRequired(),
             gender: yup
                 .string()
@@ -85,9 +100,7 @@ const ManageTeacher = ({
                 .required("Required"),
         }),
         onSubmit: async (e, { resetForm }) => {
-            // setBtnLoading(true);
-            // alert(JSON.stringify(e))
-            // return
+            setBtnLoading(true);
             const formData = new FormData();
 
             if (id && id > 0) {
@@ -105,40 +118,33 @@ const ManageTeacher = ({
             formData.append("adminId", adminId);
 
             try {
-                // alert(JSON.stringify(formData))
-                // return;
                 const { data } = await axios.post(API.HOST + API.TEACHER_SIGNUP, formData, header)
                 if (data.code === 200) {
-                    // setBtnLoading(false);
-                    // manuallyClickButtonUsingId();
-                    // setPop({ title: data.message, type: "success" }); // Success popup
-                    alert(data.message)
-                    resetForm();
-                    closePopup();
-                    onSuccess();
-                    // navigate(navLinks.LOGIN)
+                    setPop({ title: data.message, type: "success" }); // Success popup
+                    resetForm(); // resets form
+                    onSuccess(); // Triggers Table refresh
                 } else {
-                    alert(data.message)
-                    // setBtnLoading(false);
-                    // setPop({ title: data.message, type: "error" });
+                    setPop({ title: data.message, type: "error" }); // error popup
                 }
             } catch (error) {
-                // setBtnLoading(false);
-                // console.error("Error submitting form:", error);
-                alert("There was an error submitting the form.");
-                // setPop({ title: error.message, type: "error" });
+                setPop({ title: "There was an error submitting the form.", type: "error" });
+            } finally {
+                setBtnLoading(false);
             }
         },
     });
 
+    // For Edit get values from Admins
     const getTeachersById = async () => {
         if (!id) return;
         setLoading(true);
         try {
-            const res = await axios.post(
+            const res = await axios.get(
                 API.HOST + API.GET_ADMIN_BY_ID,
-                { id: id },
-                header
+                {
+                    params: { id: id },
+                    ...header
+                }
             );
 
             if (res.data.code === 200) {
@@ -153,9 +159,9 @@ const ManageTeacher = ({
             }
         } catch (err) {
             if (err.response && err.response.status === 401) {
-                navigate(navLinks.LOGIN); // <-- redirect to login page
+                navigate(navLinks.LOGIN); // redirect to login page
             } else {
-                alert(JSON.stringify(err));
+                setPop({ title: "Couldn't able to get data", type: "error" });
             }
         } finally {
             setLoading(false);
@@ -176,9 +182,10 @@ const ManageTeacher = ({
                         Loading...
                     </div>
                 ) : (
-                    <form className="space-y-4 p-4 px-5 border border-gray-200 shadow-md rounded-lg overflow-auto" onSubmit={formik.handleSubmit}>
+                    <form className="space-y-4 p-4 px-5 border border-gray-200 shadow-md rounded-lg overflow-auto"
+                        onSubmit={formik.handleSubmit} noValidate>
+                        {popup != null && <Popup unmount={() => setPop(null)} title={popup.title} type={popup.type} />}
 
-                        {/* border-gray-200 shadow-xl p-10"> */}
                         <TextField
                             label="First Name"
                             name="firstName"
@@ -202,9 +209,11 @@ const ManageTeacher = ({
                             onChange={(e) => formik.setFieldValue("lastName", e)}
                         />
 
-                        <DateField
+                        <TextField
                             label="Date of Birth"
                             name="dob"
+                            type="date"
+                            placeholder="Enter your D.O.B"
                             flex="flex flex-col md:flex-row md:items-center"
                             value={formik.values.dob}
                             error={formik.errors.dob}
@@ -224,7 +233,6 @@ const ManageTeacher = ({
                                 { label: "Female", value: "FEMALE" },
                                 { label: "Other", value: "OTHER" },
                             ]}
-                            required
                         />
 
                         <TextField
@@ -236,7 +244,6 @@ const ManageTeacher = ({
                             value={formik.values.email}
                             error={formik.errors.email}
                             onChange={(e) => formik.setFieldValue("email", e)}
-                            required
                         />
 
                         <Dropdown
@@ -261,7 +268,6 @@ const ManageTeacher = ({
                                 { label: "11", value: 11 },
                                 { label: "12", value: 12 },
                             ]}
-                            required
                         />
 
                         <Dropdown
@@ -278,7 +284,6 @@ const ManageTeacher = ({
                                 { label: "C", value: "C" },
                                 { label: "D", value: "D" }
                             ]}
-                            required
                         />
 
                         <Dropdown
@@ -296,7 +301,6 @@ const ManageTeacher = ({
                                 { label: "Science", value: "SCIENCE" },
                                 { label: "Social Science", value: "SOCIAL_SCIENCE" }
                             ]}
-                            required
                         />
 
                         <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-5 mt-5">
@@ -307,6 +311,7 @@ const ManageTeacher = ({
                             />
 
                             <Button
+                                loading={btnLoading}
                                 label="Submit"
                                 type="submit"
                             />

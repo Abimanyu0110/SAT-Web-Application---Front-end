@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+// Components
+import { Popup } from "../../components/Common/Popup";
+
 // Utils
 import API from "../../../Utils/API";
 import navLinks from "../../../Utils/navLinks";
@@ -12,29 +15,44 @@ import useAdmin from "../../../Hooks/useAdmin";
 const ViewTeacher = ({
     id
 }) => {
-    const { header, admin, formatDate } = useAdmin();
-    const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
-    const [teachers, setTeachers] = useState([]);
+    const { header, admin, formatDate } = useAdmin(); // useAdmin Hook
+    const navigate = useNavigate(); // useNavigate
 
+    const [loading, setLoading] = useState(false); // For Loading
+    const [teachers, setTeachers] = useState([]); // For Store Datas from DB
+    const [popup, setPop] = useState(null); // For Popup messages
+
+    // For Get datas from DB
     const getTeachersById = async () => {
         if (!id) return;
         setLoading(true);
         try {
-            const res = await axios.post(
+            const res = await axios.get(
                 API.HOST + API.GET_ADMIN_BY_ID,
-                { id: id },
-                header
+                {
+                    params: { id: id },
+                    ...header
+                }
             );
 
             if (res.data.code === 200) {
-                setTeachers(res.data.data || []);
+                const dbData = res?.data?.data;
+                const details = [
+                    { label: "First Name", value: dbData.firstName },
+                    { label: "Last Name", value: dbData.lastName },
+                    { label: "D.O.B", value: formatDate(dbData.dob) },
+                    { label: "Gender", value: dbData.gender },
+                    { label: "Class", value: dbData.class },
+                    { label: "Section", value: dbData.section },
+                    { label: "Subject", value: dbData.subject },
+                ];
+                setTeachers(details)
             }
         } catch (err) {
-            if (err.response && err.response.status === 401) {
-                navigate(navLinks.LOGIN); // <-- redirect to login page
+            if (err.response && err.response.status === 401) { // Auth Failure check
+                navigate(navLinks.LOGIN); // redirect to login page
             } else {
-                alert(JSON.stringify(err));
+                setPop({ title: "Couldn't able to get data", type: "error" });
             }
         } finally {
             setLoading(false);
@@ -58,44 +76,21 @@ const ViewTeacher = ({
                     </div>
                 ) : (
                     <div className="border border-gray-200 shadow rounded-lg p-4">
+                        {popup != null && <Popup unmount={() => setPop(null)} title={popup.title} type={popup.type} />}
 
                         <div className="space-y-3 w-full">
-                            <div className="w-full flex text-lg">
-                                <h2 className="font-semibold w-1/3 text-gray-700">First Name :</h2>
-                                <p className="w-2/3 text-gray-600 flex items-center">{teachers.firstName}</p>
-                            </div>
-
-                            <div className="w-full flex text-lg">
-                                <h2 className="font-semibold w-1/3 text-gray-700">Last Name :</h2>
-                                <p className="w-2/3 text-gray-600 flex items-center">{teachers.lastName}</p>
-                            </div>
-
-                            <div className="w-full flex text-lg">
-                                <h2 className="font-semibold w-1/3 text-gray-700">D.O.B :</h2>
-                                <p className="w-2/3 text-gray-600 flex items-center">{formatDate(teachers.dob)}</p>
-                            </div>
-
-                            <div className="w-full flex text-lg">
-                                <h2 className="font-semibold w-1/3 text-gray-700">Gender :</h2>
-                                <p className="w-2/3 text-gray-600 flex items-center">{teachers.gender}</p>
-                            </div>
-
-                            <div className="w-full flex text-lg">
-                                <h2 className="font-semibold w-1/3 text-gray-700">Class :</h2>
-                                <p className="w-2/3 text-gray-600 flex items-center">{teachers.class}</p>
-                            </div>
-
-                            <div className="w-full flex text-lg">
-                                <h2 className="font-semibold w-1/3 text-gray-700">Section :</h2>
-                                <p className="w-2/3 text-gray-600 flex items-center">{teachers.section}</p>
-                            </div>
-
-                            <div className="w-full flex text-lg">
-                                <h2 className="font-semibold w-1/3 text-gray-700">Subject :</h2>
-                                <p className="w-2/3 text-gray-600 flex items-center">{teachers.subject}</p>
-                            </div>
-
+                            {teachers.map((item, index) => (
+                                <div key={index} className={`w-full flex`}>
+                                    <h2 className="font-semibold w-1/3 text-gray-700">
+                                        {item.label} :
+                                    </h2>
+                                    <p className="w-2/3 text-gray-600 flex items-center">
+                                        {item.value}
+                                    </p>
+                                </div>
+                            ))}
                         </div>
+
                     </div>
                 )}
 

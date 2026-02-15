@@ -5,7 +5,6 @@ export default function useAdmin() {
     const header = {
         headers: {
             "Authorization": `Bearer ${Cookies.get("accessToken")}`,
-            // "Authorization": `Bearer ${admin.accessToken}`,
             "Content-Type": "application/json",
         },
     };
@@ -21,7 +20,6 @@ export default function useAdmin() {
         if (!dateString) return "";
 
         const date = new Date(dateString);
-        // alert("date : " + date)
 
         return date.toLocaleDateString("en-GB", {
             day: "2-digit",

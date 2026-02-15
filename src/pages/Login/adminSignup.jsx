@@ -8,7 +8,7 @@ import axios from "axios";
 import TextField from "../../components/Common/TextField";
 import Button from "../../components/Common/Button";
 import Dropdown from "../../components/Common/Dropdown";
-import DateField from "../../components/Common/DateField";
+import { Popup } from "../../components/Common/Popup";
 
 // -------------- Utils ------------------------
 import navLinks from "../../../Utils/navLinks";
@@ -19,13 +19,15 @@ import useAdmin from "../../../Hooks/useAdmin";
 
 const Signup = () => {
 
-    const navigate = useNavigate();
-    const { header } = useAdmin();
+    const navigate = useNavigate(); // useNavigate()
+    const { header } = useAdmin(); // useAdmin Hooks
     const role = "ADMIN";
+
+    const [btnLoading, setBtnLoading] = useState(false); // Button Loading
+    const [popup, setPop] = useState(null); // For Popup message
 
     const formik = useFormik({
         initialValues: {
-            // id: null,
             firstName: "",
             lastName: "",
             dob: "",
@@ -56,7 +58,17 @@ const Signup = () => {
                 .matches(/^[A-Za-z\s]+$/, "Letters Only")
                 .notRequired(),
             dob: yup
-                .date()
+                .string()
+                .test(
+                    "year-range",
+                    "Year must be between 1900 and 2099",
+                    (value) => {
+                        if (!value) return true;
+
+                        const year = parseInt(value.split("-")[0]);
+                        return year >= 1900 && year <= 2099;
+                    }
+                )
                 .notRequired(),
             gender: yup
                 .string()
@@ -94,9 +106,7 @@ const Signup = () => {
                 .required("Required"),
         }),
         onSubmit: async (e, { resetForm }) => {
-            // setBtnLoading(true);
-            // alert(JSON.stringify(e))
-            // return
+            setBtnLoading(true);
             const formData = new FormData();
 
             formData.append("firstName", e.firstName);
@@ -112,28 +122,18 @@ const Signup = () => {
             formData.append("shortName", e.shortName);
 
             try {
-                // alert(JSON.stringify(formData))
-                // return;
                 const { data } = await axios.post(API.HOST + API.ADMIN_SIGNUP, formData, header)
                 if (data.code === 200) {
-                    // setBtnLoading(false);
-                    // manuallyClickButtonUsingId();
-                    // setPop({ title: data.message, type: "success" }); // Success popup
-                    alert(data.message)
+                    setPop({ title: data.message, type: "success" }); // Success popup
                     resetForm();
                     navigate(navLinks.LOGIN)
                 } else {
-                    alert(JSON.stringify(data.message))
-                    console.log(JSON.stringify(data.message))
-                    // setBtnLoading(false);
-                    // setPop({ title: data.message, type: "error" });
+                    setPop({ title: data.message, type: "error" }); // error popup
                 }
             } catch (error) {
-                // setBtnLoading(false);
-                // console.error("Error submitting form:", error);
-                alert(error)
-                alert("There was an error submitting the form.");
-                // setPop({ title: error.message, type: "error" });
+                setPop({ title: "There was an error submitting the form.", type: "error" }); // error popup
+            } finally {
+                setBtnLoading(false);
             }
         },
     });
@@ -144,14 +144,14 @@ const Signup = () => {
 
     return (
         <>
+            {popup != null && <Popup unmount={() => setPop(null)} title={popup.title} type={popup.type} />}
             <div className="flex min-h-screen w-full flex-col items-center justify-center p-5 md:p-10">
                 <h1 className="mb-6 text-center text-3xl font-bold text-sky-700">
                     Admin Signup
                 </h1>
 
                 <form className="mx-auto w-full max-w-lg space-y-4 rounded-xl border border-gray-200 px-5 py-8 md:p-10 shadow-xl"
-                    onSubmit={formik.handleSubmit}>
-                    {/* border-gray-200 shadow-xl p-10"> */}
+                    onSubmit={formik.handleSubmit} noValidate>
                     <TextField
                         label="First Name"
                         name="firstName"
@@ -175,9 +175,11 @@ const Signup = () => {
                         onChange={(e) => formik.setFieldValue("lastName", e)}
                     />
 
-                    <DateField
+                    <TextField
                         label="Date of Birth"
                         name="dob"
+                        type="date"
+                        placeholder="Enter your D.O.B"
                         flex="flex flex-col md:flex-row md:items-center"
                         value={formik.values.dob}
                         error={formik.errors.dob}
@@ -292,6 +294,7 @@ const Signup = () => {
                         />
 
                         <Button
+                            loading={btnLoading}
                             label="Submit"
                             type="submit"
                         />

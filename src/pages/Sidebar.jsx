@@ -2,16 +2,17 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Cookies from "js-cookie";
 
+// Utils
 import navLinks from "../../Utils/navLinks";
+
+// Hooks
 import useAdmin from "../../Hooks/useAdmin";
-import ConfirmDialog from "../components/Common/ConfirmDialog";
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen, openConfirm }) => {
 
     const navigate = useNavigate();
     const location = useLocation();
     const { admin } = useAdmin();
-    const [logoutPrompt, setLogoutPrompt] = useState(false);
 
     const menus = [
         { key: "dashboardAdmin", label: "Dashboard", link: navLinks.DASHBOARD_ADMIN, role: ["ADMIN"] },
@@ -69,7 +70,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, openConfirm }) => {
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0
       `}>
-                {/* Logo */}
+                {/* Title */}
                 <div className="h-14 flex items-center px-4 text-lg font-bold border-b border-sky-200">
                     SAT
                 </div>
@@ -96,7 +97,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, openConfirm }) => {
                     {/* Logout */}
                     <div className="px-2 pb-20 lg:pb-4 bg-amber-50-">
                         <button
-                            // onClick={() => setLogoutPrompt(true)}
                             onClick={() =>
                                 openConfirm({
                                     title: "Logout",
@@ -105,26 +105,16 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, openConfirm }) => {
                                 })
                             }
                             className="
-                w-full text-left px-4 py-2 text-sm
-                bg-sky-50 text-sky-950
-                hover:bg-sky-100 rounded-xl transition
-              "
+                                w-full text-left px-4 py-2 text-sm
+                                bg-sky-50 text-sky-950
+                                hover:bg-sky-100 rounded-xl transition
+                            "
                         >
                             Logout
                         </button>
                     </div>
                 </div>
 
-                {/* <ConfirmDialog
-                    isOpen={logoutPrompt}
-                    title="Logout"
-                    message="Are you sure you want to Logout?"
-                    onYes={() => {
-                        setLogoutPrompt(false);
-                        handleLogout();
-                    }}
-                    onNo={() => setLogoutPrompt(false)}
-                /> */}
             </aside>
         </>
     );

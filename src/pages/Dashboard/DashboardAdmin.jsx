@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 // Components
 import Button from "../../components/Common/Button";
+import { Popup } from "../../components/Common/Popup";
 
 // Utils
 import API from "../../../Utils/API";
@@ -14,38 +15,41 @@ import useAdmin from "../../../Hooks/useAdmin";
 
 const DashboardAdmin = () => {
 
-  const navigate = useNavigate();
-  const { header, admin, formatDate } = useAdmin();
-  const [adminDatas, setAdminDatas] = useState();
-  const [attendanceList, setAttendanceList] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const id = admin.userId;
+  const navigate = useNavigate(); // useNavigate()
+  const { header, admin, formatDate } = useAdmin(); // useAdmin Hooks
 
+  const [adminDatas, setAdminDatas] = useState(); // For storing admin datas from DB
+  const [attendanceList, setAttendanceList] = useState([]); // For storing attendance List from DB
+  const [loading, setLoading] = useState(false); // For Loading
+  const [popup, setPop] = useState(null); // For Popup message
+  const id = admin.userId; // userIf from admin Hooks
+
+  // Get Datas from DB
   const getAdminDashboard = async () => {
     if (!id) return;
     setLoading(true);
 
     try {
-      const res = await axios.post(
+      const res = await axios.get(
         API.HOST + API.GET_ADMIN_DASHOARD,
-        { id: id },
-        header
+        {
+          params: { id: id },
+          ...header
+        }
       );
       const data = res.data.data;
 
       if (res.data.code === 200) {
-        // alert(JSON.stringify(data.adminDatas))
         setAdminDatas(data.adminDatas || "");
         setAttendanceList(data.attendanceList || []);
       }
     }
     catch (err) {
       // Check if the error is from server (401)
-      if (err.response && err.response.status === 401) {
-        alert("Session expired. Redirecting to login...");
-        navigate(navLinks.LOGIN); // <-- redirect to login page
+      if (err.response && err.response.status === 401) { // Auth error
+        navigate(navLinks.LOGIN); // redirect to login page
       } else {
-        alert(JSON.stringify(err));
+        setPop({ title: "Couldn't able to get Datas", type: "error" }); // error popup
       }
     } finally {
       setLoading(false);
@@ -58,6 +62,7 @@ const DashboardAdmin = () => {
 
   return (
     <>
+      {popup != null && <Popup unmount={() => setPop(null)} title={popup.title} type={popup.type} />}
       {loading ?
         (
           <div className="text-gray-600 bg-gray-50 flex items-center justify-center h-full md:text-2xl md:font-semibold">

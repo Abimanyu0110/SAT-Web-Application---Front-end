@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import Button from "./Button";
 
 const ConfirmDialog = ({
