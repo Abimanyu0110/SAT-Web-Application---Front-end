@@ -35,7 +35,7 @@ const ManageStudent = ({
         initialValues: {
             firstName: "",
             lastName: "",
-            dob: "",
+            dob: null,
             gender: "",
             registerNumber: "",
             class: "",
@@ -51,12 +51,14 @@ const ManageStudent = ({
                 .string()
                 .matches(/^[A-Za-z\s]+$/, "Letters Only")
                 .min(2, "Minimum " + " 2")
-                .max(20, "Maximum " + " 50")
+                .max(25, "Maximum " + " 25")
                 .required("Required"),
             lastName: yup
                 .string()
                 .matches(/^[A-Za-z\s]+$/, "Letters Only")
-                .notRequired(),
+                .min(1, "Minimum " + " 1")
+                .max(25, "Maximum " + " 25")
+                .required("Required"),
             dob: yup
                 .string()
                 .test(
@@ -69,13 +71,16 @@ const ManageStudent = ({
                         return year >= 1900 && year <= 2099;
                     }
                 )
-                .notRequired(),
+                .required("Required"),
             gender: yup
                 .string()
                 .required("Required"),
             registerNumber: yup
                 .number()
                 .typeError("Must be a number")
+                .integer("Must be an integer")
+                .min(0, "Must be positive")
+                .max(99999, "Maximum 5 digits allowed")
                 .required("Required"),
             class: yup
                 .number()
@@ -193,6 +198,7 @@ const ManageStudent = ({
                             value={formik.values.lastName}
                             error={formik.errors.lastName}
                             onChange={(e) => formik.setFieldValue("lastName", e)}
+                            required
                         />
 
                         <TextField
@@ -204,6 +210,7 @@ const ManageStudent = ({
                             value={formik.values.dob}
                             error={formik.errors.dob}
                             onChange={(e) => formik.setFieldValue("dob", e)}
+                            required
                         />
 
                         <Dropdown
@@ -219,6 +226,7 @@ const ManageStudent = ({
                                 { label: "Female", value: "FEMALE" },
                                 { label: "Other", value: "OTHER" },
                             ]}
+                            required
                         />
 
                         <TextField
@@ -230,6 +238,7 @@ const ManageStudent = ({
                             value={formik.values.registerNumber}
                             error={formik.errors.registerNumber}
                             onChange={(e) => formik.setFieldValue("registerNumber", e)}
+                            required
                         />
 
                         <Dropdown
@@ -241,19 +250,13 @@ const ManageStudent = ({
                             onChange={(e) => formik.setFieldValue("class", e)}
                             placeholder="Select class"
                             options={[
-                                { label: "1", value: 1 },
-                                { label: "2", value: 2 },
-                                { label: "3", value: 3 },
-                                { label: "4", value: 4 },
-                                { label: "5", value: 5 },
-                                { label: "6", value: 6 },
-                                { label: "7", value: 7 },
-                                { label: "8", value: 8 },
-                                { label: "9", value: 9 },
-                                { label: "10", value: 10 },
-                                { label: "11", value: 11 },
-                                { label: "12", value: 12 },
+                                { label: "I", value: 1 },
+                                { label: "II", value: 2 },
+                                { label: "III", value: 3 },
+                                { label: "IV", value: 4 },
+                                { label: "V", value: 5 },
                             ]}
+                            required
                         />
 
                         <Dropdown
@@ -267,9 +270,8 @@ const ManageStudent = ({
                             options={[
                                 { label: "A", value: "A" },
                                 { label: "B", value: "B" },
-                                { label: "C", value: "C" },
-                                { label: "D", value: "D" }
                             ]}
+                            required
                         />
 
                         <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-5 mt-5">

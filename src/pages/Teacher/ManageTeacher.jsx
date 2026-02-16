@@ -38,7 +38,7 @@ const ManageTeacher = ({
         initialValues: {
             firstName: "",
             lastName: "",
-            dob: "",
+            dob: null,
             gender: "",
             email: "",
             password: "",
@@ -60,11 +60,13 @@ const ManageTeacher = ({
                 .string()
                 .matches(/^[A-Za-z\s]+$/, "Letters Only")
                 .min(2, "Minimum " + " 2")
-                .max(20, "Maximum " + " 50")
+                .max(25, "Maximum " + " 25")
                 .required("Required"),
             lastName: yup
                 .string()
                 .matches(/^[A-Za-z\s]+$/, "Letters Only")
+                .min(1, "Minimum " + " 1")
+                .max(25, "Maximum " + " 25")
                 .notRequired(),
             dob: yup
                 .string()
@@ -78,12 +80,13 @@ const ManageTeacher = ({
                         return year >= 1900 && year <= 2099;
                     }
                 )
-                .notRequired(),
+                .required("Required"),
             gender: yup
                 .string()
                 .required("Required"),
             email: yup
                 .string()
+                .max(100, "Maximum " + " 100")
                 .email("Invalid Email ID")
                 .required("Required"),
             class: yup
@@ -148,14 +151,15 @@ const ManageTeacher = ({
             );
 
             if (res.data.code === 200) {
-                formik.setFieldValue("firstName", res.data.data.firstName);
-                formik.setFieldValue("lastName", res.data.data.lastName);
-                formik.setFieldValue("dob", toLocalDate(res.data.data.dob));
-                formik.setFieldValue("gender", res.data.data.gender);
-                formik.setFieldValue("email", res.data.data.email);
-                formik.setFieldValue("class", res.data.data.class);
-                formik.setFieldValue("section", res.data.data.section);
-                formik.setFieldValue("subject", res.data.data.subject);
+                const dbData = res.data.data
+                formik.setFieldValue("firstName", dbData.firstName);
+                formik.setFieldValue("lastName", dbData.lastName);
+                formik.setFieldValue("dob", toLocalDate(dbData.dob));
+                formik.setFieldValue("gender", dbData.gender);
+                formik.setFieldValue("email", dbData.email);
+                formik.setFieldValue("class", dbData.class);
+                formik.setFieldValue("section", dbData.section);
+                formik.setFieldValue("subject", dbData.subject);
             }
         } catch (err) {
             if (err.response && err.response.status === 401) {
@@ -218,6 +222,7 @@ const ManageTeacher = ({
                             value={formik.values.dob}
                             error={formik.errors.dob}
                             onChange={(e) => formik.setFieldValue("dob", e)}
+                            required
                         />
 
                         <Dropdown
@@ -233,6 +238,7 @@ const ManageTeacher = ({
                                 { label: "Female", value: "FEMALE" },
                                 { label: "Other", value: "OTHER" },
                             ]}
+                            required
                         />
 
                         <TextField
@@ -244,6 +250,7 @@ const ManageTeacher = ({
                             value={formik.values.email}
                             error={formik.errors.email}
                             onChange={(e) => formik.setFieldValue("email", e)}
+                            required
                         />
 
                         <Dropdown
@@ -255,19 +262,13 @@ const ManageTeacher = ({
                             onChange={(e) => formik.setFieldValue("class", e)}
                             placeholder="Select class"
                             options={[
-                                { label: "1", value: 1 },
-                                { label: "2", value: 2 },
-                                { label: "3", value: 3 },
-                                { label: "4", value: 4 },
-                                { label: "5", value: 5 },
-                                { label: "6", value: 6 },
-                                { label: "7", value: 7 },
-                                { label: "8", value: 8 },
-                                { label: "9", value: 9 },
-                                { label: "10", value: 10 },
-                                { label: "11", value: 11 },
-                                { label: "12", value: 12 },
+                                { label: "I", value: 1 },
+                                { label: "II", value: 2 },
+                                { label: "III", value: 3 },
+                                { label: "IV", value: 4 },
+                                { label: "V", value: 5 },
                             ]}
+                            required
                         />
 
                         <Dropdown
@@ -281,9 +282,8 @@ const ManageTeacher = ({
                             options={[
                                 { label: "A", value: "A" },
                                 { label: "B", value: "B" },
-                                { label: "C", value: "C" },
-                                { label: "D", value: "D" }
                             ]}
+                            required
                         />
 
                         <Dropdown
@@ -301,6 +301,7 @@ const ManageTeacher = ({
                                 { label: "Science", value: "SCIENCE" },
                                 { label: "Social Science", value: "SOCIAL_SCIENCE" }
                             ]}
+                            required
                         />
 
                         <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-5 mt-5">

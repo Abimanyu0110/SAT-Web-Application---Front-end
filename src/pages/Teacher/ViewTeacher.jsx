@@ -38,13 +38,14 @@ const ViewTeacher = ({
             if (res.data.code === 200) {
                 const dbData = res?.data?.data;
                 const details = [
-                    { label: "First Name", value: dbData.firstName },
-                    { label: "Last Name", value: dbData.lastName },
-                    { label: "D.O.B", value: formatDate(dbData.dob) },
-                    { label: "Gender", value: dbData.gender },
-                    { label: "Class", value: dbData.class },
-                    { label: "Section", value: dbData.section },
-                    { label: "Subject", value: dbData.subject },
+                    { label: "First Name", value: dbData.firstName || "-" },
+                    { label: "Last Name", value: dbData.lastName || "-" },
+                    { label: "D.O.B", value: formatDate(dbData.dob) || "-" },
+                    { label: "Gender", value: dbData.gender || "-" },
+                    { label: "Email", value: dbData.email || "-" },
+                    { label: "Class", value: dbData.class || "-" },
+                    { label: "Section", value: dbData.section || "-" },
+                    { label: "Subject", value: dbData.subject || "-" },
                 ];
                 setTeachers(details)
             }

@@ -30,7 +30,7 @@ const Signup = () => {
         initialValues: {
             firstName: "",
             lastName: "",
-            dob: "",
+            dob: null,
             gender: "",
             email: "",
             password: "",
@@ -41,21 +41,19 @@ const Signup = () => {
             organizationCode: "",
             shortName: ""
         },
-        validateOnMount: false,
-        validateOnBlur: false,
-        validateOnChange: false,
-        isInitialValid: false,
-        // enableReinitialize: true,
+
         validationSchema: yup.object().shape({
             firstName: yup
                 .string()
                 .matches(/^[A-Za-z\s]+$/, "Letters Only")
                 .min(2, "Minimum " + " 2")
-                .max(20, "Maximum " + " 50")
+                .max(25, "Maximum " + " 25")
                 .required("Required"),
             lastName: yup
                 .string()
                 .matches(/^[A-Za-z\s]+$/, "Letters Only")
+                .min(1, "Minimum " + " 1")
+                .max(25, "Maximum " + " 25")
                 .notRequired(),
             dob: yup
                 .string()
@@ -69,18 +67,19 @@ const Signup = () => {
                         return year >= 1900 && year <= 2099;
                     }
                 )
-                .notRequired(),
+                .required("Required"),
             gender: yup
                 .string()
                 .required("Required"),
             email: yup
                 .string()
+                .max(100, "Maximum " + " 100")
                 .email("Invalid Email ID")
                 .required("Required"),
             password: yup
                 .string()
-                .min(2, "Minimum " + " 2")
-                .max(50, "Maximum " + " 50")
+                .min(6, "Minimum " + " 6")
+                .max(12, "Maximum " + " 12")
                 .required("Required"),
             confirmPassword: yup
                 .string()
@@ -88,23 +87,26 @@ const Signup = () => {
                 .required("Required"),
             organizationName: yup
                 .string()
-                .min(2, "Minimum " + " 2")
-                .max(25, "Maximum" + " 25")
+                .min(5, "Minimum " + " 5")
+                .max(100, "Maximum" + " 100")
                 .required("Required"),
             secretCode: yup
                 .string()
+                .matches(/^[A-Za-z0-9]{6}$/, "Must be exactly 6 letters and numbers")
                 .required("Required"),
             shortName: yup
                 .string()
-                .matches(/^[A-Za-z\s]+$/, "Letters Only")
-                .min(2, "Minimum " + " 2")
-                .max(10, "Maximum " + " 10")
+                .matches(/^[a-z]{5}$/, "Must be exactly 5 lowercase letters")
                 .required("Required"),
             organizationCode: yup
-                .number()
-                .typeError("Must be a number")
+                .string()
+                .matches(/^\d{4}$/, "Must be exactly 4 digits")
                 .required("Required"),
         }),
+        validateOnMount: false,
+        validateOnBlur: false,
+        validateOnChange: false,
+
         onSubmit: async (e, { resetForm }) => {
             setBtnLoading(true);
             const formData = new FormData();
@@ -184,6 +186,7 @@ const Signup = () => {
                         value={formik.values.dob}
                         error={formik.errors.dob}
                         onChange={(e) => formik.setFieldValue("dob", e)}
+                        required
                     />
 
                     <Dropdown

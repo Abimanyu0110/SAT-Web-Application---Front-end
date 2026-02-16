@@ -83,7 +83,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, openConfirm }) => {
                                 key={menu.key}
                                 onClick={() => menuClick(menu.key, menu.link)}
                                 className={`
-                  w-full text-left px-4 py-2 text-sm rounded-xl transition
+                  w-full text-left px-4 py-2 text-sm rounded-xl transition cursor-pointer
                   ${activeMenu === menu.key
                                         ? "bg-sky-600"
                                         : "hover:bg-sky-700"}
@@ -106,7 +106,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, openConfirm }) => {
                             }
                             className="
                                 w-full text-left px-4 py-2 text-sm
-                                bg-sky-50 text-sky-950
+                                bg-sky-50 text-sky-950 cursor-pointer
                                 hover:bg-sky-100 rounded-xl transition
                             "
                         >
