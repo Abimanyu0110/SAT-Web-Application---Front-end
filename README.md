@@ -1,11 +1,11 @@
-## Setup and Run Instructions
+# Setup and Run Instructions
 
-# Step 1: Check Node.js Version
+## Step 1: Check Node.js Version
 
 1. Ensure your Node.js version is 20 or higher.
 2. If not, please upgrade to Node.js v20+.
 
-# Step 2: Create Environment File
+## Step 2: Create Environment File
 
 1. In the root folder of the frontend project, create a new file named: `.env.local`
 2. Add the following line to the `.env.local` file: `VITE_API_HOST=http://localhost:8080`
