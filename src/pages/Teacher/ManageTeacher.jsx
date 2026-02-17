@@ -38,7 +38,7 @@ const ManageTeacher = ({
         initialValues: {
             firstName: "",
             lastName: "",
-            dob: null,
+            dob: "",
             gender: "",
             email: "",
             password: "",
@@ -91,15 +91,12 @@ const ManageTeacher = ({
                 .required("Required"),
             class: yup
                 .number()
-                .typeError("Must be a number")
                 .required("Required"),
             section: yup
                 .string()
-                .matches(/^[A-Za-z\s]+$/, "Letters Only")
                 .required("Required"),
             subject: yup
                 .string()
-                .matches(/^[A-Za-z\s]+$/, "Letters Only")
                 .required("Required"),
         }),
         onSubmit: async (e, { resetForm }) => {

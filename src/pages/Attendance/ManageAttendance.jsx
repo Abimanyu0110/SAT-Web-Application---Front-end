@@ -65,8 +65,6 @@ const ManageAttendance = ({
             } else {
                 setPop({ title: "Couldn't able to get Student Datas", type: "error" }); // error popup
             }
-        } finally {
-            setLoading(false);
         }
     };
 

@@ -35,7 +35,7 @@ const ManageStudent = ({
         initialValues: {
             firstName: "",
             lastName: "",
-            dob: null,
+            dob: "",
             gender: "",
             registerNumber: "",
             class: "",

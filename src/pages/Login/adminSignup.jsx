@@ -257,7 +257,7 @@ const Signup = () => {
                         label="Organization Code"
                         name="organizationCode"
                         type="number"
-                        placeholder="Enter Organization Code"
+                        placeholder="Enter 4 digit code"
                         value={formik.values.organizationCode}
                         error={formik.errors.organizationCode}
                         onChange={(e) => formik.setFieldValue("organizationCode", e)}
@@ -269,7 +269,7 @@ const Signup = () => {
                         label="Secret Code"
                         name="secretCode"
                         type="text"
-                        placeholder="Enter Secret Code"
+                        placeholder="Enter 6 Letters or Numbers"
                         value={formik.values.secretCode}
                         error={formik.errors.secretCode}
                         onChange={(e) => formik.setFieldValue("secretCode", e)}
@@ -281,7 +281,7 @@ const Signup = () => {
                         label="Short Name"
                         name="shortName"
                         type="text"
-                        placeholder="Enter Short Name"
+                        placeholder="Enter 5 lowercase letters"
                         value={formik.values.shortName}
                         error={formik.errors.shortName}
                         onChange={(e) => formik.setFieldValue("shortName", e)}
